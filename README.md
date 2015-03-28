@@ -4,7 +4,7 @@ PSExcel: A Rudimentary Excel PowerShell Module
 This is a rudimentary PowerShell module for working with Excel via the [EPPlus](http://epplus.codeplex.com/) library.
 
 * Thanks to Doug Finke for his [ImportExcel example](https://github.com/dfinke/ImportExcel/blob/master/ImportExcel) - hadn't seen EPPlus before this!
-* Thanks to Philip Thompson his [expansive module](https://excelpslib.codeplex.com/) illustrating how to work with EPPlus in PowerShell
+* Thanks to Philip Thompson for his [expansive module](https://excelpslib.codeplex.com/) illustrating how to work with EPPlus in PowerShell
 * Thanks to the team and contributors behind [EPPlus](http://epplus.codeplex.com/) for a fantastic solution allowing .NET Excel interaction, without Excel.
 
 Caveats:

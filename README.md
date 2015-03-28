@@ -56,3 +56,10 @@ TODO:
      * Freeze the top, or specify row/column to freeze on.
      * Format headers.  Perhaps bold. Or highlight the background.  Maybe not.
      * Alignment
+
+Minimal testing:
+* Import-XLSX
+* Export-XLSX
+
+No Testing, subject to rename / removal:
+* Everything else

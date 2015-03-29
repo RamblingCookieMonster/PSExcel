@@ -125,6 +125,20 @@
                 {
                     $Name  = $Header[$Column]
                     $Value = $worksheet.Cells.Item($Row, ($Column+1)).Value
+                    
+                    #Handle dates, they're too common to overlook...
+                    $Format = $worksheet.Cells.Item($Row, ($Column+1)).style.numberformat.format
+                    if($Format -match '^\w{1,4}/\w{1,2}/\w{1,4}( \w{1,2}:\w{1,2})?')
+                    {
+                        Try
+                        {
+                            $Value = [datetime]::FromOADate($Value)
+                        }
+                        Catch
+                        {
+                            Write-Verbose "Error converting '$Value' to datetime"
+                        }
+                    }
 
                     if($RowData.ContainsKey($Name) )
                     {

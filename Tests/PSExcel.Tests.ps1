@@ -68,8 +68,18 @@ Describe "Import-XLSX PS$PSVersion" {
             $Props = $ExcelData[0].PSObject.Properties | Select -ExpandProperty Name
 
             $ExcelData.count | Should be 10
-            $Props[0] | Should be 'Val'
-            $Props[1] | Should be 'Name'
+
+            #Running in PS2 mode seems to result in reversed or unordered properties in a consistent manner.
+            if($PSVersion -like 2)
+            {
+                $Props[0] | Should be 'Val'
+                $Props[1] | Should be 'Name'
+            }
+            else
+            {
+                $Props[0] | Should be 'Name'
+                $Props[1] | Should be 'Val'
+            }
             $Exceldata[0].val | Should be '944041859'
             $Exceldata[0].name | Should be 'Prop1'
         }
@@ -78,8 +88,16 @@ Describe "Import-XLSX PS$PSVersion" {
             $ExcelData = Import-XLSX -Path $ExistingXLSXFile -Header one, two
             $Props = $ExcelData[0].PSObject.Properties | Select -ExpandProperty Name
 
-            $Props[0] | Should be 'one'
-            $Props[1] | Should be 'two'
+            if($PSVersion -like 2)
+            {
+                $Props[0] | Should be 'one'
+                $Props[1] | Should be 'two'
+            }
+            else
+            {
+                $Props[0] | Should be 'two'
+                $Props[1] | Should be 'one'
+            }
         }
     }
 }

@@ -62,5 +62,5 @@ Minimal testing:
 * Import-XLSX
 * Export-XLSX
 
-No Testing, subject to rename / removal:
+Minimal to no testing:
 * Everything else

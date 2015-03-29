@@ -6,11 +6,14 @@
     .DESCRIPTION
         Remove FreezePanes on a specified worksheet
 
+    .PARAMETER Worksheet
+        Remove FreezePanes from the specified worksheet
+
     .EXAMPLE
         $WorkSheet | Remove-FreezePane
 
         # Remove frozen panes on $WorkSheet
-        
+
     .NOTES
         Thanks to Doug Finke for his example:
             https://github.com/dfinke/ImportExcel/blob/master/ImportExcel.psm1
@@ -26,10 +29,10 @@
         [parameter( Mandatory=$true,
                     ValueFromPipeline=$true,
                     ValueFromPipelineByPropertyName=$true)]
-        [OfficeOpenXml.ExcelWorksheet]$WorkSheet    
+        [OfficeOpenXml.ExcelWorksheet]$WorkSheet
     )
     Process
     {
-        $WorkSheet.View.UnFreezePanes()         
+        $WorkSheet.View.UnFreezePanes()
     }
 }

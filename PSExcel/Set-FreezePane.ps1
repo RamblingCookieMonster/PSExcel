@@ -6,6 +6,23 @@
     .DESCRIPTION
         Set FreezePanes on a specified worksheet
 
+    .PARAMETER Worksheet
+        A Worksheet to set FreezePanes on
+
+    .PARAMETER Row
+        First live row after the frozen pane
+
+        Examples and outcomes:
+            -Row 2      Freeze Row 1 only
+            -Row 5      Freeze Rows 1 through 4
+
+    .PARAMETER Column
+        First live column after the frozen pane
+
+        Examples and outcomes:
+            -Column 2   Freeze Column 1 only
+            -Column 5   Freeze Columns 1 through 4
+
     .EXAMPLE
         $WorkSheet | Set-FreezePane
 
@@ -36,7 +53,7 @@
         [int]$Row = 2,
 
         [int]$Column = 1
-    
+
     )
     Process
     {

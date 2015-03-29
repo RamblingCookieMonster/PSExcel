@@ -7,7 +7,7 @@
         Save an OfficeOpenXml ExcelPackage
 
     .PARAMETER Excel
-        An ExcelPackage object to close
+        An ExcelPackage object to save
 
     .PARAMETER Path
         If specified, save as this path

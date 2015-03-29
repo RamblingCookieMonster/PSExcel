@@ -6,6 +6,9 @@
     .DESCRIPTION
         Open an ExcelPackage Workbook
 
+    .PARAMETER Excel
+        Path to an ExcelPackage
+
     .EXAMPLE
         $Excel = New-Excel -Path "C:\Excel.xlsx"
         $WorkBook = Open-Workbook $Excel

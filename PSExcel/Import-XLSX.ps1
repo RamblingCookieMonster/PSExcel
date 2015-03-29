@@ -32,6 +32,9 @@
         Thanks to Philip Thompson for an expansive set of examples on working with EPPlus in PowerShell:
             https://excelpslib.codeplex.com/
 
+        Dates won't convert to datetime.
+            Looking into solutions, in the interim, you can do this with [datetime]::FromOADate(42092.3634275347)
+
     .FUNCTIONALITY
         Excel
     #>

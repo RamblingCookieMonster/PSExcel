@@ -6,6 +6,9 @@
     .DESCRIPTION
         Create an OfficeOpenXml ExcelPackage to work with
 
+    .PARAMETER Path
+        Path to an Excel xlsx file to open
+
     .EXAMPLE
         $Excel = New-Excel -Path "C:\Excel.xlsx"
         $Excel.Workbook

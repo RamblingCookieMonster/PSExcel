@@ -130,6 +130,7 @@ Describe "Close-Excel PS$PSVersion" {
             $Excel = New-Excel -Path $NewXLSXFile
             $Excel | Close-Excel -Path "$NewXLSXFile`2"
             Test-Path "$NewXLSXFile`2" | Should be $True
+            Remove-Item "$NewXLSXFile`2" -Force -ErrorAction SilentlyContinue
         }
     }
 }

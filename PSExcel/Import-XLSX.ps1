@@ -114,7 +114,7 @@
                 }
             }
 
-            $SelectedHeaders = @( $Header | select -Unique )
+            [string[]]$SelectedHeaders = @( $Header | select -Unique )
 
             Write-Verbose "Found $(($RowStart..$Rows).count) rows, $Columns columns, with headers:`n$($Headers | Out-String)"
 

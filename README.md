@@ -83,19 +83,3 @@ Caveats:
 # Save and close!
     $Excel | Close-Excel -Save
 ```
-
-#Notes
-
-TODO:
-* Export-XLSX should provide options similar to those Philip provides:
-  * Allow various common styles.
-     * Format headers.  Perhaps bold. Or highlight the background.  Maybe not.
-     * Alignment
-*Import-XLSX should handle dates, don't see an easy way around this?
-
-Minimal testing:
-* Import-XLSX
-* Export-XLSX
-
-Minimal to no testing:
-* Everything else

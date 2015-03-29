@@ -1,4 +1,4 @@
-![https://ci.appveyor.com/api/projects/status/cew1v6k58hvfiseo/branch/master?svg=true](https://ci.appveyor.com/project/RamblingCookieMonster/psexcel)
+[![Build status](https://ci.appveyor.com/api/projects/status/cew1v6k58hvfiseo/branch/master?svg=true)](https://ci.appveyor.com/project/RamblingCookieMonster/psexcel)
 
 PSExcel: A Rudimentary Excel PowerShell Module
 =============
@@ -53,10 +53,10 @@ Caveats:
 TODO:
 
 * Export-XLSX should provide options similar to those Philip provides:
-  * Format cells based on object type
   * Allow various common styles.
      * Format headers.  Perhaps bold. Or highlight the background.  Maybe not.
      * Alignment
+*Import-XLSX should handle dates, don't see an easy way around this?
 
 Minimal testing:
 * Import-XLSX

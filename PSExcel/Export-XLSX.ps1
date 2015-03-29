@@ -181,6 +181,55 @@
                     $Object = @($RowData.PSObject.Properties)[$ColumnIndex - 1]
                     $Value = $Object.Value
                     $WorkSheet.SetValue($RowIndex, $ColumnIndex, $Value)
+
+                    Try
+                    {
+                        #Nulls will error, catch them
+                        $ThisType = $Null
+                        $ThisType = $Value.GetType().FullName
+                    }
+                    Catch
+                    {
+                        Write-Verbose "Applying no style to null in row $RowIndex, column $ColumnIndex"
+                    }
+
+                    #Idea from Philip Thompson, thank you Philip!
+                    $StyleName = $Null
+                    $ExistingStyles = @($WorkBook.Styles.NamedStyles | Select -ExpandProperty Name)
+                    Switch -regex ($ThisType)
+                    {
+                        "double|decimal|single" 
+                        {
+                            $StyleName = 'decimals'
+                            $StyleFormat = "0.00"
+                        }
+                        "int\d\d$"
+                        {
+                            $StyleName = 'ints'
+                            $StyleFormat = "0"
+                        }
+                        "datetime"
+                        {
+                            $StyleName = "dates"
+                            $StyleFormat = "M/d/yyy h:mm"
+                        }
+                        default
+                        {
+                            #No default yet...
+                        }
+                    }
+
+                    if($StyleName)
+                    {
+                        if($ExistingStyles -notcontains $StyleName)
+                        {
+                            $StyleSheet = $WorkBook.Styles.CreateNamedStyle($StyleName)
+                            $StyleSheet.Style.Numberformat.Format = $StyleFormat
+                        }
+
+                        $WorkSheet.Cells.Item($RowIndex, $ColumnIndex).Stylename = $StyleName
+                    }
+
                 }
                 Write-Verbose "Wrote row $RowIndex"
                 $RowIndex++

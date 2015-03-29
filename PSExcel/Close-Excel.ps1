@@ -6,6 +6,15 @@
     .DESCRIPTION
         Close an OfficeOpenXml ExcelPackage
 
+    .PARAMETER Excel
+        An ExcelPackage object to close
+
+    .PARAMETER Save
+        Save the ExcelPackage before closing
+
+    .PARAMETER Path
+        If specified, Save the ExcelPackage as this path before closing
+
     .EXAMPLE
         Close-Excel -Excel $Excel -Save
 
@@ -15,6 +24,11 @@
         Close-Excel -Excel $Excel
 
         #Close $Excel without saving
+
+    .EXAMPLE
+        Close-Excel -Excel $Excel -Path C:\new.xlsx
+
+        #Save $Excel as C:\new.xlsx and close
 
     .NOTES
         Thanks to Doug Finke for his example:
@@ -34,20 +48,18 @@
         [OfficeOpenXml.ExcelPackage]$Excel,
 
         [Switch]$Save,
-        
-        [switch]$SaveAs,
 
         [parameter( Mandatory=$false,
                     ValueFromPipeline=$false,
-                    ValueFromPipelineByPropertyName=$true)]
+                    ValueFromPipelineByPropertyName=$false)]
         [validatescript({
-            $Parent = Split-Path $_ -Parent
-            if( -not (Test-Path -Path $Parent -PathType Container) )
+            $Parent = Split-Path $_ -Parent -ErrorAction SilentlyContinue
+            if( -not (Test-Path -Path $Parent -PathType Container -ErrorAction SilentlyContinue) )
             {
                 Throw "Specify a valid path.  Parent '$Parent' does not exist: $_"
             }
             $True
-        })]
+        })]        
         [string]$Path
     )
     Process
@@ -56,9 +68,8 @@
         {            
             Try
             {
-                if($SaveAs)
+                if($Path)
                 {
-
                     Try
                     {
                         #Resolve relative paths... Thanks Oisin! http://stackoverflow.com/a/3040982/3067642
@@ -66,33 +77,33 @@
                     }
                     Catch
                     {
-                        Write-Error $_
+                        Write-Error "Could not resolve path for '$Path': $_"
                         continue
                     }
                     
-                    write-verbose "Saving $($xl.File) as $($Path) and closing"
+                    write-verbose "Saving $($xl.File) as $($Path)"
 
-                    $xl.save()
-                    $xl.Dispose()
-                    $xl = $null
-            
+                    $xl.saveas($Path)
                 }
                 elseif($Save)
                 {
-                    write-verbose "Saving and closing $($xl.File)"
+                    write-verbose "Saving $($xl.File)"
 
                     $xl.save()
-                    $xl.Dispose()
-                    $xl = $null
-
                 }
-                Else
-                {
-                    write-verbose "Closing $($xl.File)"
+            }
+            Catch
+            {
+                Write-Error "Error saving file.  Will not close this ExcelPackage: $_"
+                Continue
+            }
+            
+            Try
+            {
+                write-verbose "Closing $($xl.File)"
 
-                    $xl.Dispose()
-                    $xl = $null
-                }
+                $xl.Dispose()
+                $xl = $null
             }
             Catch
             {

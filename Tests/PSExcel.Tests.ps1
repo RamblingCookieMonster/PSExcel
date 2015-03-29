@@ -105,6 +105,35 @@ Describe "Export-XLSX PS$PSVersion" {
     }
 }
 
+Describe "Close-Excel PS$PSVersion" {
+    
+    Context 'Strict mode' { 
+
+        Set-StrictMode -Version latest
+
+        It 'should close an excelpackage' {
+            $Excel = New-Excel -Path $NewXLSXFile
+            $File = $Excel.File
+            $Excel | Close-Excel
+            $Excel.File -like $File | Should be $False
+        }
+
+        It 'should save when requested' {
+            Remove-Item $NewXLSXFile -Force -ErrorAction SilentlyContinue
+            $Excel = New-Excel -Path $NewXLSXFile
+            [void]$Excel.Workbook.Worksheets.Add(1)
+            $Excel | Close-Excel -Save
+            Test-Path $NewXLSXFile | Should be $True
+        }
+
+        It 'should save as a specified path' {
+            $Excel = New-Excel -Path $NewXLSXFile
+            $Excel | Close-Excel -Path "$NewXLSXFile`2"
+            Test-Path "$NewXLSXFile`2" | Should be $True
+        }
+    }
+}
+
 
 Remove-Item $NewXLSXFile -force -ErrorAction SilentlyContinue
 Remove-Item $ExistingXLSXFile -force -ErrorAction SilentlyContinue

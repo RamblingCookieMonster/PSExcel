@@ -92,7 +92,7 @@
             }
 
             $RowStart = 2
-            if($Header)
+            if($Header -and $Header.count -gt 0)
             {
                 if($Header.count -ne $Columns)
                 {
@@ -107,7 +107,7 @@
             {
                 $Header = foreach ($Column in 1..$Columns)
                 {
-                    $worksheet.Cells[1,$Column].Text
+                    $worksheet.Cells.Item(1,$Column).Value
                 }
             }
 

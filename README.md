@@ -63,4 +63,4 @@ Minimal testing:
 * Export-XLSX
 
 No Testing, subject to rename / removal:
-* New-Excel
+* Everything else

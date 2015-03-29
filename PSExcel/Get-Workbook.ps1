@@ -1,17 +1,17 @@
-﻿function Open-Workbook {
+﻿function Get-Workbook {
     <#
     .SYNOPSIS
-        Open an ExcelPackage Workbook
+        Return a Workbook from an ExcelPackage
 
     .DESCRIPTION
-        Open an ExcelPackage Workbook
+        Return a Workbook from an ExcelPackage
 
     .PARAMETER Excel
-        Path to an ExcelPackage
-
+        ExcelPackage to extract workbook from
+    
     .EXAMPLE
         $Excel = New-Excel -Path "C:\Excel.xlsx"
-        $WorkBook = Open-Workbook $Excel
+        $WorkBook = Get-Workbook $Excel
         $WorkBook
 
         #Open C:\Excel.xlsx, view the workbook
@@ -23,6 +23,9 @@
         Thanks to Philip Thompson for an expansive set of examples on working with EPPlus in PowerShell:
             https://excelpslib.codeplex.com/
 
+    .LINK
+        https://github.com/RamblingCookieMonster/PSExcel
+
     .FUNCTIONALITY
         Excel
     #>
@@ -30,7 +33,7 @@
     param(
         [parameter( Mandatory=$true,
                     ValueFromPipeline=$true,
-                    ValueFromPipelineByPropertyName=$true)]
+                    ValueFromPipelineByPropertyName=$false)]
         [OfficeOpenXml.ExcelPackage]$Excel
     )
     Process

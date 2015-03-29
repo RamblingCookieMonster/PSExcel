@@ -37,6 +37,9 @@
         Thanks to Philip Thompson for an expansive set of examples on working with EPPlus in PowerShell:
             https://excelpslib.codeplex.com/
 
+    .LINK
+        https://github.com/RamblingCookieMonster/PSExcel
+
     .FUNCTIONALITY
         Excel
     #>

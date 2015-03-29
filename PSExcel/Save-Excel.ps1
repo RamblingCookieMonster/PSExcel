@@ -7,7 +7,7 @@
         Save an OfficeOpenXml ExcelPackage
 
     .PARAMETER Excel
-        An ExcelPackage object to save
+        An ExcelPackage object to close
 
     .PARAMETER Path
         If specified, save as this path
@@ -36,6 +36,9 @@
 
         Thanks to Philip Thompson for an expansive set of examples on working with EPPlus in PowerShell:
             https://excelpslib.codeplex.com/
+
+    .LINK
+        https://github.com/RamblingCookieMonster/PSExcel
 
     .FUNCTIONALITY
         Excel

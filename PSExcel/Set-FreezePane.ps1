@@ -6,23 +6,6 @@
     .DESCRIPTION
         Set FreezePanes on a specified worksheet
 
-    .PARAMETER Worksheet
-        A Worksheet to set FreezePanes on
-
-    .PARAMETER Row
-        First live row after the frozen pane
-
-        Examples and outcomes:
-            -Row 2      Freeze Row 1 only
-            -Row 5      Freeze Rows 1 through 4
-
-    .PARAMETER Column
-        First live column after the frozen pane
-
-        Examples and outcomes:
-            -Column 2   Freeze Column 1 only
-            -Column 5   Freeze Columns 1 through 4
-
     .EXAMPLE
         $WorkSheet | Set-FreezePane
 
@@ -40,6 +23,9 @@
         Thanks to Philip Thompson for an expansive set of examples on working with EPPlus in PowerShell:
             https://excelpslib.codeplex.com/
 
+    .LINK
+        https://github.com/RamblingCookieMonster/PSExcel
+
     .FUNCTIONALITY
         Excel
     #>
@@ -52,11 +38,17 @@
 
         [int]$Row = 2,
 
-        [int]$Column = 1
+        [int]$Column = 1,
 
+        [switch]$Passthru
+    
     )
     Process
     {
         $WorkSheet.View.FreezePanes($Row, $Column)
+        if($Passthru)
+        {
+            $WorkSheet
+        }
     }
 }

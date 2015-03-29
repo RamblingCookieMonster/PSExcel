@@ -6,9 +6,6 @@
     .DESCRIPTION
         Create an OfficeOpenXml ExcelPackage to work with
 
-    .PARAMETER Path
-        Path to an Excel xlsx file to open
-
     .EXAMPLE
         $Excel = New-Excel -Path "C:\Excel.xlsx"
         $Excel.Workbook
@@ -21,6 +18,9 @@
 
         Thanks to Philip Thompson for an expansive set of examples on working with EPPlus in PowerShell:
             https://excelpslib.codeplex.com/
+
+    .LINK
+        https://github.com/RamblingCookieMonster/PSExcel
 
     .FUNCTIONALITY
         Excel

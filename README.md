@@ -46,6 +46,42 @@ Caveats:
 
 # Import data from an XLSX spreadsheet
     Import-XLSX -Path C:\Files.xlsx
+
+#Create some demo data
+    $DemoData = 1..10 | Foreach-Object{
+
+        $EID = Get-Random -Minimum 1 -Maximum 1000
+        $Date = (Get-Date).adddays(-$EID)
+
+        New-Object -TypeName PSObject -Property @{
+            Name = "jsmith$_"
+            EmployeeID = $EID
+            Date = $Date
+        } | Select Name, EmployeeID, Date
+    }
+
+# Export it
+    $DemoData | Export-XLSX -Path C:\temp\Demo.xlsx
+
+# Import it back
+    $Imported = Import-XLSX -Path C:\Temp\Demo.xlsx -Header samaccountname, EID, Date
+
+# Open that Excel file...
+    $Excel = New-Excel -Path C:\temp\Demo.xlsx
+
+# Get a workbook
+    $Workbook = $Excel | Get-Workbook
+
+# Get a worksheet - can pipe ExcelPackage or Workbook.
+# Filtering on Name is optional
+    $Worksheet = $Excel | Get-Worksheet
+    $Worksheet = $Workbook | Get-Worksheet -Name Worksheet1
+
+# Freeze the top row
+    $Worksheet | Set-FreezePane -Row 2
+
+# Save and close!
+    $Excel | Close-Excel -Save
 ```
 
 #Notes

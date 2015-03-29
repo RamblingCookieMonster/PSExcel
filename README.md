@@ -1,9 +1,9 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/cew1v6k58hvfiseo/branch/master?svg=true)](https://ci.appveyor.com/project/RamblingCookieMonster/psexcel)
 
-PSExcel: A Rudimentary Excel PowerShell Module
+PSExcel
 =============
 
-This is a rudimentary PowerShell module for working with Excel via the [EPPlus](http://epplus.codeplex.com/) library.
+This is a rudimentary PowerShell module for working with Excel via the [EPPlus](http://epplus.codeplex.com/) library, with no dependencies on Excel itself.
 
 * Thanks to Doug Finke for his [ImportExcel example](https://github.com/dfinke/ImportExcel/blob/master/ImportExcel) - hadn't seen EPPlus before this!
 * Thanks to Philip Thompson for his [expansive module](https://excelpslib.codeplex.com/) illustrating how to work with EPPlus in PowerShell

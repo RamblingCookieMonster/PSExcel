@@ -52,11 +52,9 @@ Caveats:
 
 TODO:
 
-* Import-XLSX should handle CSV data
 * Export-XLSX should provide options similar to those Philip provides:
   * Format cells based on object type
   * Allow various common styles.
-     * Freeze the top, or specify row/column to freeze on.
      * Format headers.  Perhaps bold. Or highlight the background.  Maybe not.
      * Alignment
 

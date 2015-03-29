@@ -38,7 +38,7 @@
         [switch]$SaveAs,
 
         [parameter( Mandatory=$false,
-                    ValueFromPipeline=$true,
+                    ValueFromPipeline=$false,
                     ValueFromPipelineByPropertyName=$true)]
         [validatescript({
             $Parent = Split-Path $_ -Parent

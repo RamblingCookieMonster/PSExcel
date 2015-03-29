@@ -1,3 +1,5 @@
+![https://ci.appveyor.com/api/projects/status/cew1v6k58hvfiseo/branch/master?svg=true](https://ci.appveyor.com/project/RamblingCookieMonster/psexcel)
+
 PSExcel: A Rudimentary Excel PowerShell Module
 =============
 
@@ -10,7 +12,8 @@ This is a rudimentary PowerShell module for working with Excel via the [EPPlus](
 Caveats:
 
 * This covers limited functionality; contributions to this function or additional functions would be welcome!
-* Minimal testing.  Will add Pester tests at some point.  Contributions welcome!
+* Minimal testing.  Contributions welcome!
+* Naming conventions subject to change.  Suggestions welcome!
 
 #Functionality
 
@@ -62,4 +65,4 @@ Minimal testing:
 * Export-XLSX
 
 No Testing, subject to rename / removal:
-* Everything else
+* New-Excel

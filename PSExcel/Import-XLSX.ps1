@@ -121,7 +121,7 @@
                 foreach ($Column in 0..($Columns - 1) )
                 {
                     $Name  = $Header[$Column]
-                    $Value = $worksheet.Cells[$Row, ($Column+1)].Text
+                    $Value = $worksheet.Cells.Item($Row, ($Column+1)).Value
 
                     if($RowData.ContainsKey($Name) )
                     {

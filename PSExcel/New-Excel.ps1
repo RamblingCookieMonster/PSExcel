@@ -42,17 +42,18 @@
     )
     Process
     {
-        #Resolve relative paths... Thanks Oisin! http://stackoverflow.com/a/3040982/3067642
-        $Path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
-
-        write-verbose "Creating excel object with path '$path'"
 
         if($path)
         {
+            #Resolve relative paths... Thanks Oisin! http://stackoverflow.com/a/3040982/3067642
+            $Path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+            Write-Verbose "Creating excel object with path '$path'"
+
             New-Object OfficeOpenXml.ExcelPackage $Path
         }
         else
         {
+            Write-Verbose "Creating excel object with no specified path"
             New-Object OfficeOpenXml.ExcelPackage
         }
     }

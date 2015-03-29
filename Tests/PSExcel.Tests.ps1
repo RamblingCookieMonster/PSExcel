@@ -72,14 +72,24 @@ Describe "Import-XLSX PS$PSVersion" {
            
             $Exceldata[0].val | Should be '944041859'
             $Exceldata[0].name | Should be 'Prop1'
+
+        }
+        It 'should parse numberformat for dates' {
+            $ExcelData = Import-XLSX -Path $ExistingXLSXFile
+             
+            $Exceldata[0].Date -is [datetime] | Should be $True
+            $Exceldata[0].Date.Month | Should be 1
+            $Exceldata[0].Date.Year | Should be 2015
+            $Exceldata[0].Date.Hour | Should be 4
         }
 
         It 'should replace headers' {
-            $ExcelData = Import-XLSX -Path $ExistingXLSXFile -Header one, two
+            $ExcelData = Import-XLSX -Path $ExistingXLSXFile -Header one, two, three
             $Props = $ExcelData[0].PSObject.Properties | Select -ExpandProperty Name
 
             $Props[0] | Should be 'one'
-            $Props[1] | Should be 'two'
+            $Props[1] | Should be 'two' 
+            $Props[2] | Should be 'three'  
         }
     }
 }
@@ -134,7 +144,6 @@ Describe "Close-Excel PS$PSVersion" {
         }
     }
 }
-
 
 Remove-Item $NewXLSXFile -force -ErrorAction SilentlyContinue
 Remove-Item $ExistingXLSXFile -force -ErrorAction SilentlyContinue

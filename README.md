@@ -51,7 +51,6 @@ Caveats:
 #Notes
 
 TODO:
-
 * Export-XLSX should provide options similar to those Philip provides:
   * Allow various common styles.
      * Format headers.  Perhaps bold. Or highlight the background.  Maybe not.

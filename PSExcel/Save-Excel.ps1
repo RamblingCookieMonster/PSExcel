@@ -61,7 +61,9 @@
             }
             $True
         })]        
-        [string]$Path
+        [string]$Path,
+
+        [switch]$Close
     )
     Process
     {

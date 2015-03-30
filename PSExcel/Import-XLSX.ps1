@@ -6,6 +6,18 @@
     .DESCRIPTION
         Import data from Excel
 
+    .PARAMETER Path
+        Path to an xlsx file to import
+
+    .PARAMETER Sheet
+        Index or name of Worksheet to import
+
+    .PARAMETER Header
+        Replacement headers.  Must match order and count of your data's properties.
+
+    .PARAMETER FirstRowIsData
+        Indicates that the first row is data, not headers.  Must be used with -Header. 
+            
     .EXAMPLE
         Import-XLSX -Path "C:\Excel.xlsx"
 

@@ -2,9 +2,15 @@
     <#
     .SYNOPSIS
         Remove FreezePanes on a specified worksheet
-
+    
     .DESCRIPTION
         Remove FreezePanes on a specified worksheet
+
+    .PARAMETER Worksheet
+        Worksheet to remove FreezePanes from
+
+    .PARAMETER Passthru
+        If specified, pass the Worksheet back
 
     .EXAMPLE
         $WorkSheet | Remove-FreezePane

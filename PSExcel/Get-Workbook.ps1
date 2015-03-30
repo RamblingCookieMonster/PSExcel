@@ -29,6 +29,7 @@
     .FUNCTIONALITY
         Excel
     #>
+    [OutputType([OfficeOpenXml.ExcelWorkbook])]
     [cmdletbinding()]
     param(
         [parameter( Mandatory=$true,

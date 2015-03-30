@@ -9,6 +9,7 @@
         Note:
             Each time you call this function, you need to save and re-create your Excel Object.
             If you attempt to modify the Excel object, save, modify, and save a second time, it will fail.
+            See Save-Excel Passthru parameter for a workaround
         
     .PARAMETER Worksheet
         Worksheet to format cells on
@@ -71,12 +72,15 @@
                 Get-WorkSheet |
                 Format-ExcelCell -Header -Bold $True -Size 14
         
-        #Save your changes
-            $Excel | Save-Excel
+        #Save your changes, re-open the excel file
+            $Excel = $Excel | Save-Excel -Passthru
 
-        # At this point, you need to repeat the entire process
-        # You cannot call Format-ExcelCell and re-save
-        # Will look into why this is the case and whether we can fix it
+        #Oops, too big!  Get the worksheet, format the header as size 11
+            $Excel |
+                Get-WorkSheet |
+                Format-ExcelCell -Header -Size 11
+
+            $Excel | Save-Excel -Close
 
     .EXAMPLE
         $WorkSheet | Format-ExcelCell -StartRow 2 -StartColumn 1 -EndColumn 1 -Italic $True -Size 10
@@ -107,6 +111,7 @@
     .FUNCTIONALITY
         Excel
     #>
+    [OutputType([OfficeOpenXml.ExcelWorksheet])]
     [cmdletbinding(DefaultParameterSetname = 'Range')]
     param(
         [parameter( Mandatory=$true,

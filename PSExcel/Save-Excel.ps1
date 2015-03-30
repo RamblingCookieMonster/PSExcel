@@ -15,6 +15,9 @@
     .PARAMETER Close
         If specified, close after saving
 
+    .PARAMETER Passthru
+        If specified, re-create and return the Excel object
+
     .EXAMPLE
         Save-Excel -Excel $Excel
 
@@ -30,6 +33,11 @@
 
         #Save $Excel as C:\new.xlsx
 
+    .EXAMPLE
+        $Excel = $Excel | Save-Excel -Passthru
+
+        #Save $Excel, re-open it to continue working with it.
+
     .NOTES
         Thanks to Doug Finke for his example:
             https://github.com/dfinke/ImportExcel/blob/master/ImportExcel.psm1
@@ -43,6 +51,7 @@
     .FUNCTIONALITY
         Excel
     #>
+    [OutputType([OfficeOpenXml.ExcelPackage])]
     [cmdletbinding()]
     param(
         [parameter( Mandatory=$true,
@@ -63,7 +72,9 @@
         })]        
         [string]$Path,
 
-        [switch]$Close
+        [switch]$Close,
+
+        [switch]$Passthru
     )
     Process
     {
@@ -93,6 +104,14 @@
                     write-verbose "Saving $($xl.File)"
 
                     $xl.save()
+                }
+
+                if($Passthru)
+                {
+                    $OpenPath = $xl.File
+                    $xl.Dispose()
+                    $xl = $Null
+                    New-Excel -Path $OpenPath
                 }
             }
             Catch

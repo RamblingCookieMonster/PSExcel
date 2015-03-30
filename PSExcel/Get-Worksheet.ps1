@@ -39,6 +39,7 @@
     .FUNCTIONALITY
         Excel
     #>
+    [OutputType([OfficeOpenXml.ExcelWorksheet])]
     [cmdletbinding(DefaultParameterSetName = "Workbook")]
     param(
         [parameter(Mandatory=$false,

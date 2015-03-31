@@ -232,7 +232,6 @@ Describe "Get-Worksheet PS$PSVersion" {
 
 }
 
-
 Describe "Search-CellValue PS$PSVersion" {
 
     Context 'Strict mode' { 

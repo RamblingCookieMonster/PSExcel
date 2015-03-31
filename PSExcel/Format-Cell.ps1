@@ -238,24 +238,27 @@
                 'WrapText'   { $CellRange.Style.WrapText = $WrapText  }
                 'Autofit'    {
                     #Probably a cleaner way to call this...
-                    if($PSBoundParameters.ContainsKey('AutofitMinWidth'))
+                    try
                     {
-                        if($AutofitMaxWidth)
+                        if($PSBoundParameters.ContainsKey('AutofitMaxWidth'))
                         {
                             $CellRange.AutoFitColumns($AutofitMinWidth, $AutofitMaxWidth)
                         }
-                        else
+                        elseif($PSBoundParameters.ContainsKey('AutofitMinWidth'))
                         {
                             $CellRange.AutoFitColumns($AutofitMinWidth)
                         }
+                        else
+                        {
+                            $CellRange.AutoFitColumns()
+                        }
                     }
-                    else
+                    Catch
                     {
-                        $CellRange.AutoFitColumns()
+                        Write-Error $_
                     }
-                 }
+                }
             }
-
         if($Passthru)
         {
             $WorkSheet

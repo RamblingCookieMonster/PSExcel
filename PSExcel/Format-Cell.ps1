@@ -45,7 +45,13 @@
         Set font name
         
     .PARAMETER Color
-        Set color
+        Set font color
+
+    .PARAMETER BackgroundColor
+        Set background fill color
+
+    .PARAMETER FillStyle
+        Set the FillStyle, if BackgroundColor is specified.  Default is Solid
 
     .PARAMETER WrapText
         Add or remove WrapText property (boolean)
@@ -58,6 +64,12 @@
     
     .PARAMETER AutoFitMaxWidth
         Maximum width to set autofit with
+
+    .PARAMETER VerticalAlignment
+        Set the vertical alignment
+
+    .PARAMETER HorizontalAlignment
+        Set the horizontal alignment
 
     .PARAMETER Passthru
         If specified, pass the Worksheet back
@@ -152,16 +164,49 @@
         [boolean]$Underline,
         [int]$Size,
         [string]$Font,
-        [System.Drawing.Color]$Color,
+        [System.Drawing.KnownColor]$Color,
+        [System.Drawing.KnownColor]$BackgroundColor,
+        [OfficeOpenXml.Style.ExcelFillStyle]$FillStyle,
         [boolean]$WrapText,
         [switch]$Autofit,
         [double]$AutofitMinWidth,
         [double]$AutofitMaxWidth,
+        [OfficeOpenXml.Style.ExcelVerticalAlignment]$VerticalAlignment,
+        [OfficeOpenXml.Style.ExcelHorizontalAlignment]$HorizontalAlignment,
 
         [switch]$Passthru
     )
     Begin
     {
+
+        if($PSBoundParameters.ContainsKey('Color'))
+        {
+            Try
+            {
+                $ColorConverted = [System.Drawing.Color]::FromKnownColor($Color)
+            }
+            Catch
+            {
+                Throw "Failed to convert $($Color) to a valid System.Drawing.Color: $_"
+            }
+        }
+
+        if($PSBoundParameters.ContainsKey('BackgroundColor'))
+        {
+            Try
+            {
+                $BackgroundColorConverted = [System.Drawing.Color]::FromKnownColor($BackgroundColor)
+                if(-not $PSBoundParameters.ContainsKey('FillStyle'))
+                {
+                    $FillStyle = [OfficeOpenXml.Style.ExcelFillStyle]::Solid
+                }
+            }
+            Catch
+            {
+                Throw "Failed to convert $($Color) to a valid System.Drawing.Color: $_"
+            }
+        }
+
         #From http://stackoverflow.com/questions/297213/translate-a-column-index-into-an-excel-column-name
         Function Get-ExcelColumn
         {
@@ -229,14 +274,20 @@
             
             switch ($PSBoundParameters.Keys)
             {
-                'Bold'       { $CellRange.Style.Font.Bold = $Bold  }
-                'Italic'     { $CellRange.Style.Font.Italic = $Italic  }
-                'Underline'  { $CellRange.Style.Font.UnderLine = $Underline}
-                'Size'       { $CellRange.Style.Font.Size = $Size }
-                'Font'       { $CellRange.Style.Font.Name = $Font }
-                'Color'      { $CellRange.Style.Font.Color.SetColor($Color) }
-                'WrapText'   { $CellRange.Style.WrapText = $WrapText  }
-                'Autofit'    {
+                'Bold'                { $CellRange.Style.Font.Bold = $Bold  }
+                'Italic'              { $CellRange.Style.Font.Italic = $Italic  }
+                'Underline'           { $CellRange.Style.Font.UnderLine = $Underline}
+                'Size'                { $CellRange.Style.Font.Size = $Size }
+                'Font'                { $CellRange.Style.Font.Name = $Font }
+                'Color'               { $CellRange.Style.Font.Color.SetColor($ColorConverted) }
+                'BackgroundColor'     {
+                    $CellRange.Style.Fill.PatternType = $FillStyle
+                    $CellRange.Style.Fill.BackgroundColor.SetColor($BackgroundColorConverted)
+                }
+                'WrapText'            { $CellRange.Style.WrapText = $WrapText  }
+                'VerticalAlignment'   { $CellRange.Style.VerticalAlignment = $VerticalAlignment }
+                'HorizontalAlignment' { $CellRange.Style.HorizontalAlignment = $HorizontalAlignment }
+                'Autofit'         {
                     #Probably a cleaner way to call this...
                     try
                     {

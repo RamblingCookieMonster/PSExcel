@@ -21,8 +21,6 @@ Caveats:
 * Import Excel spreadsheets to PowerShell as objects
 * No dependency on Excel being installed
 
-![Example](/Media/Example.png)
-
 #Instructions
 
 ```powershell

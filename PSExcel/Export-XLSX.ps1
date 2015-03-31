@@ -19,7 +19,7 @@
         Header to use. Must match order and count of your data's properties
 
     .PARAMETER Force
-        If file exists, overwrite it.
+        If file exists, overwrite it.  Otherwise, we try to add a new worksheet.
 
     .EXAMPLE
         $Files = Get-ChildItem C:\ -File
@@ -43,6 +43,15 @@
         # Send it to export-xlsx
         # give it new headers
         # overwrite C:\random.xlsx if it exists
+
+    .EXAMPLE
+
+        #
+        # Create XLSX
+        Get-ChildItem -file | export-xlsx -Path C:\temp\multi.xlsx
+
+        # Add a second worksheet to the xlsx
+        Get-ChildItem -file | export-xlsx -Path C:\temp\multi.xlsx -WorksheetName "Two"
 
     .NOTES
         Thanks to Doug Finke for his example:
@@ -100,7 +109,7 @@
             }
             else
             {
-                Throw "'$Path' exists.  Use -Force to overwrite."
+                Write-Verbose "'$Path' exists.  Use -Force to overwrite.  Attempting to add sheet to existing workbook."
             }
         }
 

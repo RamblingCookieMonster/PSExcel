@@ -71,6 +71,15 @@
     .PARAMETER HorizontalAlignment
         Set the horizontal alignment
 
+    .PARAMETER Border
+        Set a border to the left, right, top, bottom, or all (*).
+
+    .PARAMETER BorderStyle
+        Style for the border. Defaults to Thin
+
+    .PARAMETER BorderColor
+        Color for the border. Defaults to Black
+
     .PARAMETER Passthru
         If specified, pass the Worksheet back
 
@@ -164,20 +173,40 @@
         [boolean]$Underline,
         [int]$Size,
         [string]$Font,
+        
         [System.Drawing.KnownColor]$Color,
         [System.Drawing.KnownColor]$BackgroundColor,
         [OfficeOpenXml.Style.ExcelFillStyle]$FillStyle,
         [boolean]$WrapText,
+
         [switch]$Autofit,
         [double]$AutofitMinWidth,
         [double]$AutofitMaxWidth,
+
         [OfficeOpenXml.Style.ExcelVerticalAlignment]$VerticalAlignment,
         [OfficeOpenXml.Style.ExcelHorizontalAlignment]$HorizontalAlignment,
+
+        [validateset('Left','Right','Top','Bottom','*')]
+        [string[]]$Border,
+        [OfficeOpenXml.Style.ExcelBorderStyle]$BorderStyle,
+        [System.Drawing.KnownColor]$BorderColor,
 
         [switch]$Passthru
     )
     Begin
     {
+
+        if($PSBoundParameters.ContainsKey('BorderColor'))
+        {
+            Try
+            {
+                $BorderColorConverted = [System.Drawing.Color]::FromKnownColor($BorderColor)
+            }
+            Catch
+            {
+                Throw "Failed to convert $($BorderColor) to a valid System.Drawing.Color: $_"
+            }
+        }
 
         if($PSBoundParameters.ContainsKey('Color'))
         {
@@ -203,7 +232,7 @@
             }
             Catch
             {
-                Throw "Failed to convert $($Color) to a valid System.Drawing.Color: $_"
+                Throw "Failed to convert $($BackgroundColor) to a valid System.Drawing.Color: $_"
             }
         }
 
@@ -307,6 +336,25 @@
                     Catch
                     {
                         Write-Error $_
+                    }
+                }
+                'Border' {
+                    If($Border -eq '*')
+                    {
+                        $Border = 'Top', 'Bottom', 'Left', 'Right'
+                    }
+                    foreach($Side in @( $Border | Select -Unique ) )
+                    {
+                        if(-not $BorderStyle)
+                        {
+                            $BorderStyle = [OfficeOpenXml.Style.ExcelBorderStyle]::Thin
+                        }
+                        if(-not $BorderColorConverted)
+                        {
+                            $BorderColorConverted = [System.Drawing.Color]::Black
+                        }
+                        $CellRange.Style.Border.$Side.Style = $BorderStyle
+                        $CellRange.Style.Border.$Side.Color.SetColor( $BorderColorConverted )
                     }
                 }
             }

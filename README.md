@@ -17,7 +17,7 @@ Caveats:
 
 #Functionality
 
-* Export random PowerShell output to Excel spreadsheets:
+* Export random PowerShell output to Excel spreadsheets
 * Import Excel spreadsheets to PowerShell as objects
 * No dependency on Excel being installed
 
@@ -47,6 +47,17 @@ Caveats:
 # Import data from an XLSX spreadsheet
     Import-XLSX -Path C:\Files.xlsx
 
+```
+
+#Examples
+
+Several examples are available on [the accompanying blog post](http://ramblingcookiemonster.github.io/PSExcel-Intro/) and the embedded [Gist](https://gist.github.com/RamblingCookieMonster/7f49beeaebb570204581#file-zpsexcel-intro-ps1).
+
+Some highlights:
+
+### Export and import data
+
+```powershell
 #Create some demo data
     $DemoData = 1..10 | Foreach-Object{
 
@@ -65,17 +76,26 @@ Caveats:
 
 # Import it back
     $Imported = Import-XLSX -Path C:\Temp\Demo.xlsx -Header samaccountname, EID, Date
+```
 
-# Open that Excel file...
+Verify that it exported:
+
+![Excel](http://ramblingcookiemonster.github.io/images/psexcel-intro/export.png)
+
+Check the data we imported back:
+
+![Imported data](http://ramblingcookiemonster.github.io/images/psexcel-intro/imported.png)
+
+### Fun with formatting
+
+Freeze panes:
+
+```powershell
+# Open the previously created Excel file...
     $Excel = New-Excel -Path C:\temp\Demo.xlsx
 
-# Get a workbook
-    $Workbook = $Excel | Get-Workbook
-
-# Get a worksheet - can pipe ExcelPackage or Workbook.
-# Filtering on Name is optional
-    $Worksheet = $Excel | Get-Worksheet
-    $Worksheet = $Workbook | Get-Worksheet -Name Worksheet1
+# Get a Worksheet
+    $Worksheet = $Excel | Get-Worksheet -Name Worksheet1
 
 # Freeze the top row
     $Worksheet | Set-FreezePane -Row 2
@@ -83,3 +103,40 @@ Caveats:
 # Save and close!
     $Excel | Close-Excel -Save
 ```
+
+![Freeze panes](http://ramblingcookiemonster.github.io/images/psexcel-intro/frozenpane.png)
+
+Format the header:
+
+```powershell
+# Re-open the file
+    $Excel = New-Excel -Path C:\temp\Demo.xlsx
+
+# Add bold, size 15 formatting to the header
+    $Excel |
+        Get-WorkSheet |
+        Format-Cell -Header -Bold $True -Size 14
+
+# Save and re-open the saved changes
+    $Excel = $Excel | Save-Excel -Passthru
+```
+
+![Header format](http://ramblingcookiemonster.github.io/images/psexcel-intro/header.png)
+
+Format the first column:
+
+```powershell
+#  Text was too large!  Set it to 11
+    $Excel |
+        Get-WorkSheet |
+        Format-Cell -Header -Size 11
+
+    $Excel |
+        Get-WorkSheet |
+        Format-Cell -StartColumn 1 -EndColumn 1 -Autofit -AutofitMinWidth -AutofitMaxWidth 7 -Color DarkRed
+
+# Save and close
+    $Excel | Save-Excel -Close
+```
+
+![First column](http://ramblingcookiemonster.github.io/images/psexcel-intro/format2.png)

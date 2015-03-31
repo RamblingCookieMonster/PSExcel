@@ -1,4 +1,4 @@
-﻿function Format-ExcelCell {
+﻿function Format-Cell {
     <#
     .SYNOPSIS
         Format cells in an Excel worksheet
@@ -70,7 +70,7 @@
         #Get the worksheet, format the header as bold, size 14
             $Excel |
                 Get-WorkSheet |
-                Format-ExcelCell -Header -Bold $True -Size 14
+                Format-Cell -Header -Bold $True -Size 14
         
         #Save your changes, re-open the excel file
             $Excel = $Excel | Save-Excel -Passthru
@@ -78,12 +78,12 @@
         #Oops, too big!  Get the worksheet, format the header as size 11
             $Excel |
                 Get-WorkSheet |
-                Format-ExcelCell -Header -Size 11
+                Format-Cell -Header -Size 11
 
             $Excel | Save-Excel -Close
 
     .EXAMPLE
-        $WorkSheet | Format-ExcelCell -StartRow 2 -StartColumn 1 -EndColumn 1 -Italic $True -Size 10
+        $WorkSheet | Format-Cell -StartRow 2 -StartColumn 1 -EndColumn 1 -Italic $True -Size 10
 
         # Set the first column, rows 2 through the end to size 10, italic
 
@@ -94,7 +94,7 @@
         # Set autofit between minumum of 5 and maximum of 20
         $Excel |
             Get-WorkSheet |
-            Format-ExcelCell -Autofit -AutofitMinWidth  -AutofitMaxWidth 20
+            Format-Cell -Autofit -AutofitMinWidth  -AutofitMaxWidth 20
 
     .NOTES
         Thanks to Doug Finke for his example:
@@ -102,8 +102,6 @@
 
         Thanks to Philip Thompson for an expansive set of examples on working with EPPlus in PowerShell:
             https://excelpslib.codeplex.com/
-
-        Ad hoc testing so far, will add to Pester so we can see if I broke anything for PS2
 
     .LINK
         https://github.com/RamblingCookieMonster/PSExcel

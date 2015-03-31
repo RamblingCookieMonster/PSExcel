@@ -145,5 +145,122 @@ Describe "Close-Excel PS$PSVersion" {
     }
 }
 
+Describe "Save-Excel PS$PSVersion" {
+    
+    Context 'Strict mode' { 
+
+        Set-StrictMode -Version latest
+
+        It 'should save an xlsx file' {
+            
+            Remove-Item $NewXLSXFile -Force -ErrorAction SilentlyContinue
+            
+            $Excel = New-Excel -Path $NewXLSXFile
+            [void]$Excel.Workbook.Worksheets.Add(1)
+            $Excel | Save-Excel
+            
+            Test-Path $NewXLSXFile | Should be $True
+        }
+
+        It 'should close an excelpackage when specified' {
+            
+            Remove-Item $NewXLSXFile -Force -ErrorAction SilentlyContinue
+
+            $Excel = New-Excel -Path $NewXLSXFile
+            [void]$Excel.Workbook.Worksheets.Add(1)
+            $File = $Excel.File
+            $Excel | Save-Excel -Close
+            
+            $Excel.File -like $File | Should be $False
+        }
+
+        It 'should save as a specified path' {
+            
+            Remove-Item "$NewXLSXFile`2" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$NewXLSXFile" -Force -ErrorAction SilentlyContinue
+
+            $Excel = New-Excel -Path $NewXLSXFile
+            [void]$Excel.Workbook.Worksheets.Add(1)
+            $Excel | Save-Excel -Path "$NewXLSXFile`2"
+            
+            Test-Path "$NewXLSXFile`2" | Should be $True
+            Remove-Item "$NewXLSXFile`2" -Force -ErrorAction SilentlyContinue
+        }
+
+        It 'should return a fresh excelpackage when passthru is specified' {
+            
+            #If you want to save twice, you need to pull the excel package back in, otherwise, it bombs out.
+
+            Remove-Item "$NewXLSXFile" -Force -ErrorAction SilentlyContinue
+            
+            $Excel = New-Excel -Path $NewXLSXFile
+            [void]$Excel.Workbook.Worksheets.Add(1)
+            $Excel = $Excel | Save-Excel -Passthru
+            
+            $Excel -is [OfficeOpenXml.ExcelPackage] | Should Be $True 
+
+            [void]$Excel.Workbook.Worksheets.Add(2)
+            @($Excel.Workbook.Worksheets).count | Should be 2
+            $Excel | Save-Excel
+
+            $Excel = New-Excel -Path $NewXLSXFile
+            @($Excel.Workbook.Worksheets).count | Should be 2
+            
+            Remove-Item "$NewXLSXFile" -Force -ErrorAction SilentlyContinue
+        }
+    }
+}
+
+
+# Describe "Format-Cell PS$PSVersion" {}
+# Describe "Get-Workbook PS$PSVersion" {}
+Describe "Get-Worksheet PS$PSVersion" {
+
+ Context 'Strict mode' { 
+
+        Set-StrictMode -Version latest
+
+        It 'Should return a worksheet' {
+         
+            $Excel = New-Excel -Path $ExistingXLSXFile
+            $WorkSheet = $Excel | Get-Worksheet
+            $WorkSheet -is [OfficeOpenXml.ExcelWorksheet] | Should Be $True
+            $WorkSheet.Name | Should Be 'WorkSheet1'
+
+        }
+    }
+
+}
+
+
+Describe "Search-CellValue PS$PSVersion" {
+
+    Context 'Strict mode' { 
+
+        Set-StrictMode -Version latest
+
+        It 'Should find cells' {
+            
+            $Result = @( Search-CellValue -Path $ExistingXLSXFile -FilterScript {$_ -eq "Prop2" -or ($_ -is [datetime] -and $_.day -like 7)} )
+            $Result.Count | Should be 2
+            $Result[0].Row | Should be 3
+            $Result[0].Match | Should be 'Prop2'
+
+        }
+
+        It 'Should return raw when specified' {
+            $Result = @( Search-CellValue -Path $ExistingXLSXFile -FilterScript {$_ -eq 'Prop3'} -as Raw )
+            $Result.count | Should be 1
+            $Result[0] -is [string] | Should be $True
+        }
+
+        It 'Should return ExcelRange if specified' {
+            $Result = @( Search-CellValue -Path $ExistingXLSXFile -FilterScript {$_ -is [string]} -as Passthru )
+            $Result.count | Should be 13
+            $Result[0] -is [OfficeOpenXml.ExcelRangeBase] | Should be $True
+        }
+    }
+}
+
 Remove-Item $NewXLSXFile -force -ErrorAction SilentlyContinue
 Remove-Item $ExistingXLSXFile -force -ErrorAction SilentlyContinue

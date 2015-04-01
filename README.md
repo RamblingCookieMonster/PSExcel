@@ -78,11 +78,13 @@ Some highlights:
 
 Verify that it exported:
 
-    ![Excel](http://ramblingcookiemonster.github.io/images/psexcel-intro/export.png)
+![Excel](http://ramblingcookiemonster.github.io/images/psexcel-intro/export.png)
+
 
 Check the data we imported back:
 
-    ![Imported data](http://ramblingcookiemonster.github.io/images/psexcel-intro/imported.png)
+![Imported data](http://ramblingcookiemonster.github.io/images/psexcel-intro/imported.png)
+
 
 ### Fun with formatting
 
@@ -102,7 +104,9 @@ Freeze panes:
     $Excel | Close-Excel -Save
 ```
 
-    ![Freeze panes](http://ramblingcookiemonster.github.io/images/psexcel-intro/frozenpane.png)
+
+![Freeze panes](http://ramblingcookiemonster.github.io/images/psexcel-intro/frozenpane.png)
+
 
 Format the header:
 
@@ -119,7 +123,9 @@ Format the header:
     $Excel = $Excel | Save-Excel -Passthru
 ```
 
-    ![Header format](http://ramblingcookiemonster.github.io/images/psexcel-intro/header.png)
+
+![Header format](http://ramblingcookiemonster.github.io/images/psexcel-intro/header.png)
+
 
 Format the first column:
 
@@ -137,7 +143,9 @@ Format the first column:
     $Excel | Save-Excel -Close
 ```
 
-    ![First column](http://ramblingcookiemonster.github.io/images/psexcel-intro/format2.png)
+
+![First column](http://ramblingcookiemonster.github.io/images/psexcel-intro/format2.png)
+
 
 ### Pivot tables and charts
 
@@ -148,6 +156,9 @@ This is straight from Doug Finke's fantastic [ImportExcel module](https://github
     Get-ChildItem $env:USERPROFILE -Recurse -File |
         Export-XLSX -Path C:\Temp\Files.xlsx -PivotRows Extension -PivotValues Length -ChartType Pie
 ```
-    [![Pivot](http://ramblingcookiemonster.github.io/images/psexcel-intro/pivot.png)](http://ramblingcookiemonster.github.io/images/psexcel-intro/pivot.png)
+
+
+[![Pivot](http://ramblingcookiemonster.github.io/images/psexcel-intro/pivot.png)](http://ramblingcookiemonster.github.io/images/psexcel-intro/pivot.png)
+
 
 Note that while some of these examples leverage PowerShell version 3 or later language, the module itself should work with PowerShell 2, and all Pester tests run against both PowerShell 2 and PowerShell 4.

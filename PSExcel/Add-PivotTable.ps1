@@ -185,7 +185,16 @@
 
             Try
             {
-                $PivotWorkSheet = $Excel.Workbook.Worksheets.Add($PivotTableWorksheetName)
+                if( @( $Excel.WorkBook.Worksheets | Select -ExpandProperty Name -ErrorAction SilentlyContinue) -contains $PivotTableWorksheetName)
+                {
+                    Write-Error "Skipping existing worksheet '$PivotTableWorksheetName'"
+                    continue
+                }
+                else
+                {
+                    Write-Verbose "Adding pivot worksheet $PivotTableWorksheetName"
+                    $PivotWorkSheet = $Excel.Workbook.Worksheets.Add($PivotTableWorksheetName)
+                }
             }
             Catch
             {
@@ -216,12 +225,16 @@
                 $End = ConvertTo-ExcelCoordinate -Row $EndRow -Column $EndColumn
                 $RangeCoordinates = "$Start`:$End"
                 
+                Write-Verbose "Adding pivot table over data range '$RangeCoordinates' with name PT$PivotTableWorksheetName"
+
             #Pivot! Borrowed from Doug Finke - thanks Doug!
-                $PivotWorkSheet.View.TabSelected = $True
-                $PivotTable = $PivotWorkSheet.PivotTables.Add($PivotWorkSheet.Cells["A1"], $SourceWorkSheet.Cells[$RangeCoordinates], "PivotTable1")
+                #$PivotWorkSheet.View.TabSelected = $True
+                $PivotTable = $PivotWorkSheet.PivotTables.Add($PivotWorkSheet.Cells["A1"], $SourceWorkSheet.Cells[$RangeCoordinates], "PT$PivotTableWorksheetName")
             
                 if($PivotRows)
                 {
+                    Write-Verbose "Adding PivotRows $PivotRows"
+
                     foreach ($Row in @($PivotRows | Select -Unique))
                     {
                         [void]$PivotTable.RowFields.Add($PivotTable.Fields[$Row])
@@ -230,6 +243,8 @@
 
                 if($PivotColumns)
                 {
+                    Write-Verbose "Adding PivotColumns $PivotColumns"
+
                     foreach ($Column in @($PivotColumns | Select -Unique))
                     {
                         [void]$PivotTable.ColumnFields.Add($PivotTable.Fields[$Column])
@@ -238,6 +253,8 @@
 
                 if($PivotValues)
                 {
+                    Write-Verbose "Adding PivotValues $PivotValues"
+
                     foreach ($Value in @($PivotValues | Select -Unique))
                     {
                         [void]$PivotTable.DataFields.Add($PivotTable.Fields[$Value])
@@ -246,15 +263,18 @@
 
                 if($ChartType)
                 {
+
                     Write-Verbose "Adding $ChartType chart"
-                    $chart = $PivotWorkSheet.Drawings.AddChart('PivotChart1', $ChartType, $PivotTable)
+                    $chart = $PivotWorkSheet.Drawings.AddChart("PC$PivotTableWorksheetName", $ChartType, $PivotTable)
                     $chart.SetPosition(1, 0, 6, 0)
                     $chart.SetSize(600, 400)
                 }
 
             if($PSCmdlet.ParameterSetName -like 'File' -and -not $Passthru)
             {
+                Write-Verbose "Saving '$($Excel.File)'"
                 $Excel.save()
+                $Excel.Dispose()
             }
             if($Passthru)
             {

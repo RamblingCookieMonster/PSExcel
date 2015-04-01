@@ -112,6 +112,37 @@ Describe "Export-XLSX PS$PSVersion" {
             $Files.Count | Should be $ExportedData.count
         }
 
+        It 'should build pivot tables' {
+
+            Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
+            
+            Get-ChildItem C:\Windows |
+                Where {-not $_.PSIsContainer} |
+                Export-XLSX -Path $NewXLSXFile -PivotRows Extension -PivotValues Length
+
+            $Excel = New-Excel -Path $NewXLSXFile
+            
+            $WorkSheet = @( $Excel | Get-Worksheet -Name PivotTable1 )
+
+            $worksheet[0].PivotTables[0].RowFields[0].Name | Should be Extension
+        }
+
+        It 'should build pivot charts' {
+
+            Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
+            
+            Get-ChildItem C:\Windows |
+                Where {-not $_.PSIsContainer} |
+                Export-XLSX -Path $NewXLSXFile -PivotRows Extension -PivotValues Length -ChartType Pie
+
+            $Excel = New-Excel -Path $NewXLSXFile
+            
+            $WorkSheet = @( $Excel | Get-Worksheet -Name PivotTable1 )
+
+            $WorkSheet[0].Drawings[0].ChartType.ToString() | Should be 'Pie' 
+
+        }
+
     }
 }
 

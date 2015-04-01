@@ -235,32 +235,6 @@
                 Throw "Failed to convert $($BackgroundColor) to a valid System.Drawing.Color: $_"
             }
         }
-
-        #From http://stackoverflow.com/questions/297213/translate-a-column-index-into-an-excel-column-name
-        Function Get-ExcelColumn
-        {
-            param([int]$ColumnIndex)
-
-            [string]$Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
-            $ColumnIndex -= 1
-            [int]$Quotient = [math]::floor($ColumnIndex / 26)
-
-            if($Quotient -gt 0)
-            {
-                ( GetExcelColumn -ColumnIndex $Quotient ) + $Chars[$ColumnIndex % 26]
-            }
-            else
-            {
-                $Chars[$ColumnIndex % 26]
-            }
-        }
-        Function Get-ExcelCoordinate
-        {
-            param($RowIndex, $ColumnIndex)
-            $ColumnIndex = Get-ExcelColumn $ColumnIndex
-            "$ColumnIndex$RowIndex"
-        }
     }
     Process
     {
@@ -294,8 +268,8 @@
                 $EndColumn = $dimension.End.Column
             }
 
-            $Start = Get-ExcelCoordinate -RowIndex $StartRow -ColumnIndex $StartColumn
-            $End = Get-ExcelCoordinate -RowIndex $EndRow -ColumnIndex $EndColumn
+            $Start = ConvertTo-ExcelCoordinate -Row $StartRow -Column $StartColumn
+            $End = ConvertTo-ExcelCoordinate -Row $EndRow -Column $EndColumn
             $RangeCoordinates = "$Start`:$End"
 
         # Apply the formatting

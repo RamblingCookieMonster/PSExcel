@@ -18,6 +18,18 @@
     .PARAMETER Header
         Header to use. Must match order and count of your data's properties
 
+    .PARAMETER PivotRows
+        If specified, add pivot table pivoting on these rows
+
+    .PARAMETER PivotColumns
+        If specified, add pivot table pivoting on these columns
+
+    .PARAMETER PivotValues
+        If specified, add pivot table pivoting on these values
+
+    .PARAMETER ChartType
+        If specified, add pivot chart of this type
+
     .PARAMETER Force
         If file exists, overwrite it.  Otherwise, we try to add a new worksheet.
 
@@ -53,9 +65,23 @@
         # Add a second worksheet to the xlsx
         Get-ChildItem -file | export-xlsx -Path C:\temp\multi.xlsx -WorksheetName "Two"
 
+    .EXAMPLE
+    
+        Get-ChildItem C:\ -file |
+            Export-XLSX -Path C:\temp\files.xlsx -PivotRows Extension -PivotValues Length -ChartType Pie
+        
+        # Get files
+        # Create an xlsx in C:\temp\ps.xlsx
+        # Pivot rows on 'Extension'
+        # Pivot values on 'Length
+        # Add a pie chart
+
+        #This example gives you a pie chart breaking down storage by file extension
+
     .NOTES
-        Thanks to Doug Finke for his example:
-            https://github.com/dfinke/ImportExcel/blob/master/ImportExcel.psm1
+        Thanks to Doug Finke for his example
+        The pivot stuff is straight from Doug:
+            https://github.com/dfinke/ImportExcel
 
         Thanks to Philip Thompson for an expansive set of examples on working with EPPlus in PowerShell:
             https://excelpslib.codeplex.com/
@@ -66,7 +92,7 @@
     .FUNCTIONALITY
         Excel
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='NoPivot')]
     param(
         [parameter( Position = 0,
                     Mandatory=$true )]
@@ -89,6 +115,18 @@
         [string[]]$Header,
 
         [string]$WorksheetName = "Worksheet1",
+
+        [parameter( ParameterSetName = 'Pivot')]
+        [string[]]$PivotRows,
+
+        [parameter( ParameterSetName = 'Pivot')]
+        [string[]]$PivotColumns,
+
+        [parameter( ParameterSetName = 'Pivot')]
+        [string[]]$PivotValues,
+
+        [parameter( ParameterSetName = 'Pivot')]
+        [OfficeOpenXml.Drawing.Chart.eChartType]$ChartType,
 
         [switch]$Force
     )
@@ -245,6 +283,17 @@
                 }
                 Write-Verbose "Wrote row $RowIndex"
                 $RowIndex++
+            }
+
+            #Any pivot params specified?  add a pivot!
+            If($PSCmdlet.ParameterSetName -eq 'Pivot')
+            {
+                $Params = @{}
+                if($PivotRows)    {$Params.Add('PivotRows',$PivotRows)}
+                if($PivotColumns) {$Params.Add('PivotColumns',$PivotColumns)}
+                if($PivotValues)  {$Params.Add('PivotValues',$PivotValues)}
+                if($ChartType)    {$Params.Add('ChartType',$ChartType)}
+                $Excel = Add-PivotTable @Params -Excel $Excel -WorkSheetName $WorksheetName -Passthru
             }
 
             $Excel.SaveAs($Path)

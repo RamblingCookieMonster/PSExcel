@@ -138,3 +138,16 @@ Format the first column:
 ```
 
 ![First column](http://ramblingcookiemonster.github.io/images/psexcel-intro/format2.png)
+
+### Pivot tables and charts
+
+This is straight from Doug Finke's fantastic [ImportExcel module](https://github.com/dfinke/ImportExcel):
+
+```powershell
+# Fun with pivot tables and charts! Props to Doug Finke
+    Get-ChildItem $env:USERPROFILE -Recurse -File |
+        Export-XLSX -Path C:\Temp\Files.xlsx -PivotRows Extension -PivotValues Length -ChartType Pie
+```
+[![Pivot](http://ramblingcookiemonster.github.io/images/psexcel-intro/pivot.png)](http://ramblingcookiemonster.github.io/images/psexcel-intro/pivot.png)
+
+Note that while some of these examples leverage PowerShell version 3 or later language, the module itself should work with PowerShell 2, and all Pester tests run against both PowerShell 2 and PowerShell 4.

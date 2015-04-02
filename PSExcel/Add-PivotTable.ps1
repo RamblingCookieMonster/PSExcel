@@ -57,7 +57,7 @@
     .PARAMETER ChartWidth
         Width of the chart
 
-    .PARAMETER ChartType
+    .PARAMETER ChartHeight
         Height of the chart
 
     .PARAMETER Passthru

@@ -51,6 +51,15 @@
     .PARAMETER ChartType
         If specified, add a chart with this type
 
+    .PARAMETER ChartTitle
+        Optional chart title
+
+    .PARAMETER ChartWidth
+        Width of the chart
+
+    .PARAMETER ChartType
+        Height of the chart
+
     .PARAMETER Passthru
         If specified, pass the ExcelPackage back
 
@@ -71,6 +80,14 @@
 
     .EXAMPLE
 
+        #Create an xlsx.
+            Get-ChildItem C:\ -file | Export-XLSX -Path C:\temp\files.xlsx
+
+        # Open the excel file, add a pivot table (this won't save), pass through the excel object, save.
+            New-Excel -Path C:\temp\files.xlsx |
+                Add-PivotTable -PivotRows Extension -PivotValues Length -ChartType Pie -ChartTitle "Space per Extension" -ChartWidth 800 -ChartHeight 600 -Passthru |
+                Save-Excel -Close
+
     .NOTES
         Thanks to Doug Finke for his example
         This function borrows heavily if not everything from Doug:
@@ -88,20 +105,21 @@
     [OutputType([OfficeOpenXml.ExcelPackage])]
     [cmdletbinding(DefaultParameterSetName = 'Excel')]
     param(
-        [parameter( Position = 0,
-                    ParameterSetName = 'File',
-                    Mandatory=$true,
-                    ValueFromPipeline=$true,
-                    ValueFromPipelineByPropertyName=$true)]
-        [validatescript({Test-Path $_})]
-        [string]$Path,
 
         [parameter( Position = 0,
                     ParameterSetName = 'Excel',
                     Mandatory=$true,
                     ValueFromPipeline=$true,
-                    ValueFromPipelineByPropertyName=$true)]
+                    ValueFromPipelineByPropertyName=$false)]
         [OfficeOpenXml.ExcelPackage]$Excel,
+
+        [parameter( Position = 0,
+                    ParameterSetName = 'File',
+                    Mandatory=$true,
+                    ValueFromPipeline=$true,
+                    ValueFromPipelineByPropertyName=$false)]
+        [validatescript({Test-Path $_})]
+        [string]$Path,
 
         [parameter( Position = 1,
                     Mandatory=$false,
@@ -144,6 +162,9 @@
         [string[]]$PivotValues,
 
         [OfficeOpenXml.Drawing.Chart.eChartType]$ChartType,
+        [string]$ChartTitle,
+        [int]$ChartWidth = 600,
+        [int]$ChartHeight = 400,
 
         [switch]$Passthru
     )
@@ -267,7 +288,11 @@
                     Write-Verbose "Adding $ChartType chart"
                     $chart = $PivotWorkSheet.Drawings.AddChart("PC$PivotTableWorksheetName", $ChartType, $PivotTable)
                     $chart.SetPosition(1, 0, 6, 0)
-                    $chart.SetSize(600, 400)
+                    $chart.SetSize($ChartWidth, $ChartHeight)
+                    if($ChartTitle)
+                    {
+                        $chart.title.text = $ChartTitle
+                    }
                 }
 
             if($PSCmdlet.ParameterSetName -like 'File' -and -not $Passthru)

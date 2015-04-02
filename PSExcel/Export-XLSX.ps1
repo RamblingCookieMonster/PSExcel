@@ -33,6 +33,12 @@
     .PARAMETER ChartType
         If specified, add pivot chart of this type
 
+    .PARAMETER Table
+        If specified, add table to all cells
+
+    .PARAMETER TableStyle
+        If specified, add table style
+
     .PARAMETER Force
         If file exists, overwrite it.  Otherwise, we try to add a new worksheet.
 
@@ -55,18 +61,17 @@
             Export-XLSX -Path C:\Random.xlsx -Force -Header Name, Val
 
         # Generate data
-        # Send it to export-xlsx
-        # give it new headers
-        # overwrite C:\random.xlsx if it exists
+        # Send it to Export-XLSX
+        # Give it new headers
+        # Overwrite C:\random.xlsx if it exists
 
     .EXAMPLE
 
-        #
         # Create XLSX
-        Get-ChildItem -file | export-xlsx -Path C:\temp\multi.xlsx
+        Get-ChildItem -file | Export-XLSX -Path C:\temp\multi.xlsx
 
         # Add a second worksheet to the xlsx
-        Get-ChildItem -file | export-xlsx -Path C:\temp\multi.xlsx -WorksheetName "Two"
+        Get-ChildItem -file | Export-XLSX -Path C:\temp\multi.xlsx -WorksheetName "Two"
 
     .EXAMPLE
 
@@ -74,12 +79,20 @@
             Export-XLSX -Path C:\temp\files.xlsx -PivotRows Extension -PivotValues Length -ChartType Pie
 
         # Get files
-        # Create an xlsx in C:\temp\ps.xlsx
+        # Create an xlsx in C:\temp\files.xlsx
         # Pivot rows on 'Extension'
         # Pivot values on 'Length
         # Add a pie chart
 
-        #This example gives you a pie chart breaking down storage by file extension
+        # This example gives you a pie chart breaking down storage by file extension
+
+    .EXAMPLE
+
+	Get-Process | Export-XLSX -Path C:\temp\process.xlsx -Worksheet process -Table -TableStyle Medium1 -AutoFit
+
+	# Get all processes
+	# Create an xlsx
+	# Create a table with the Medium1 style and all cells autofit on the 'process' worksheet
 
     .NOTES
         Thanks to Doug Finke for his example
@@ -130,6 +143,10 @@
 
         [parameter( ParameterSetName = 'Pivot')]
         [OfficeOpenXml.Drawing.Chart.eChartType]$ChartType,
+
+        [switch]$Table,
+
+        [OfficeOpenXml.Table.TableStyles]$TableStyle = [OfficeOpenXml.Table.TableStyles]"Medium2",
 
         [switch]$AutoFit,
 
@@ -290,7 +307,7 @@
                 $RowIndex++
             }
 
-            #Any pivot params specified?  add a pivot!
+            # Any pivot params specified?  add a pivot!
             if($PSCmdlet.ParameterSetName -eq 'Pivot')
             {
                 $Params = @{}
@@ -300,11 +317,16 @@
                 if($ChartType)    {$Params.Add('ChartType',$ChartType)}
                 $Excel = Add-PivotTable @Params -Excel $Excel -WorkSheetName $WorksheetName -Passthru
             }
+            # Create table
+            elseif($Table)
+            {
+                $Excel = Add-Table -Excel $Excel -WorkSheetName $WorksheetName -TableStyle $TableStyle -Passthru
+            }
 
-	    if($AutoFit)
-	    {
-	        $WorkSheet.Cells[$WorkSheet.Dimension.Address].AutoFitColumns()
-	    }
+            if($AutoFit)
+            {
+                $WorkSheet.Cells[$WorkSheet.Dimension.Address].AutoFitColumns()
+            }
 
             $Excel.SaveAs($Path)
     }

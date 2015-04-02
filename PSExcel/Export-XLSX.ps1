@@ -85,11 +85,11 @@
         # Add a pie chart
 
         # This example gives you a pie chart breaking down storage by file extension
-	
+
     .EXAMPLE
-	
-	Get-Process | Export-XLSX -Path C:\temp\process.xlsx -Worksheet process -Table -TableStyle Medium1 -AutoFit 
-	
+
+	Get-Process | Export-XLSX -Path C:\temp\process.xlsx -Worksheet process -Table -TableStyle Medium1 -AutoFit
+
 	# Get all processes
 	# Create an xlsx
 	# Create a table with the Medium1 style and all cells autofit on the 'process' worksheet

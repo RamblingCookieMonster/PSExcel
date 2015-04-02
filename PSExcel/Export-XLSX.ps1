@@ -18,6 +18,9 @@
     .PARAMETER Header
         Header to use. Must match order and count of your data's properties
 
+    .PARAMETER AutoFit
+        If specified, autofit everything
+
     .PARAMETER PivotRows
         If specified, add pivot table pivoting on these rows
 
@@ -66,10 +69,10 @@
         Get-ChildItem -file | export-xlsx -Path C:\temp\multi.xlsx -WorksheetName "Two"
 
     .EXAMPLE
-    
+
         Get-ChildItem C:\ -file |
             Export-XLSX -Path C:\temp\files.xlsx -PivotRows Extension -PivotValues Length -ChartType Pie
-        
+
         # Get files
         # Create an xlsx in C:\temp\ps.xlsx
         # Pivot rows on 'Extension'
@@ -127,6 +130,8 @@
 
         [parameter( ParameterSetName = 'Pivot')]
         [OfficeOpenXml.Drawing.Chart.eChartType]$ChartType,
+
+        [switch]$AutoFit,
 
         [switch]$Force
     )
@@ -248,7 +253,7 @@
                     $ExistingStyles = @($WorkBook.Styles.NamedStyles | Select -ExpandProperty Name)
                     Switch -regex ($ThisType)
                     {
-                        "double|decimal|single" 
+                        "double|decimal|single"
                         {
                             $StyleName = 'decimals'
                             $StyleFormat = "0.00"
@@ -286,7 +291,7 @@
             }
 
             #Any pivot params specified?  add a pivot!
-            If($PSCmdlet.ParameterSetName -eq 'Pivot')
+            if($PSCmdlet.ParameterSetName -eq 'Pivot')
             {
                 $Params = @{}
                 if($PivotRows)    {$Params.Add('PivotRows',$PivotRows)}
@@ -295,6 +300,11 @@
                 if($ChartType)    {$Params.Add('ChartType',$ChartType)}
                 $Excel = Add-PivotTable @Params -Excel $Excel -WorkSheetName $WorksheetName -Passthru
             }
+
+	    if($AutoFit)
+	    {
+	        $WorkSheet.Cells[$WorkSheet.Dimension.Address].AutoFitColumns()
+	    }
 
             $Excel.SaveAs($Path)
     }

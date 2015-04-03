@@ -147,6 +147,19 @@ Format the first column:
 ![First column](http://ramblingcookiemonster.github.io/images/psexcel-intro/format2.png)
 
 
+### Create tables
+
+Why format the columns yourself? Create a table (thanks to awiddersheim!):
+
+```
+# Add a table, autofit the data.  We use force to overwrite our previous demo.
+    $DemoData | Export-XLSX -Path C:\Temp\Demo.xlsx -Table -Autofit -Force
+```
+
+
+![Table](http://ramblingcookiemonster.github.io/images/psexcel-intro/table.png)
+
+
 ### Pivot tables and charts
 
 This is straight from Doug Finke's fantastic [ImportExcel module](https://github.com/dfinke/ImportExcel):

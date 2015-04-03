@@ -1,0 +1,59 @@
+This is a rudimentary PowerShell module for working with Excel via the EPPlus library.
+
+Frequently Asked Questions:
+
+    - What version of Excel do I need to use this module?
+        None!  This module has no dependency on Excel whatsoever, it is based on the EPPlus library, which is included in the module.
+
+    - How do I find all the commands in the module?
+        Get-Command -Module PSExcel
+
+    - How do I get help for a command, including examples?
+        Get-Help Export-XLSX -Full
+        Get-Help Export-XLSX -ShowWindow (PS3 and later)
+
+    - Can you add functionality <insert what you want here>?
+        PSExcel is an open source project on GitHub.  You are more than welcome to post suggestions in the 'Issues' page there, or better yet, fork PSExcel, make your changes, submit a PR describing what you did, and contribute to the project!
+
+        Project page: github.com/RamblingCookieMonster/PSExcel
+        Issues page: github.com/RamblingCookieMonster/PSExcel/issues
+
+    - Can you fix <insert broken functionality here>?
+        See 'Can you add functionality' response - submit an issue, and consider contributing a solution!
+
+        Note that some issues may stem from the EPPlus library that we rely on.  You can submit issues to and contribute there as well.
+
+        EPPlus page: epplus.codeplex.com
+
+    - Where can I find more examples?
+        The PSExcel GitHub page and introductory blog post may include more examples than the comment-based help we provide.
+
+        PSExcel on GitHub: github.com/RamblingCookieMonster/PSExcel
+        pseXCEL Intro Blog post: ramblingcookiemonster.github.io/PSExcel-Intro
+
+Dependencies:
+
+    - Does NOT depend on Excel!
+    - Requires PowerShell 2 or later
+
+References:
+
+    - EPPlus URL:
+        epplus.codeplex.com
+    
+    - Doug Finke's ImportExcel (inspired this, we borrowed ideas and code):
+        github.com/dfinke/ImportExcel
+
+    - Philip Thompson's ExcelPSLib (we borrowed ideas):
+        excelpslib.codeplex.com
+
+    - PSExcel on GitHub:
+        github.com/RamblingCookieMonster/PSExcel
+
+    - PSExcel Intro Blog Post:
+        ramblingcookiemonster.github.io/PSExcel-Intro
+
+    -Automated testing results:
+        ci.appveyor.com/project/RamblingCookieMonster/psexcel/history
+
+

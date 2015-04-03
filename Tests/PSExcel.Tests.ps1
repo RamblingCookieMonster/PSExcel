@@ -125,6 +125,9 @@ Describe "Export-XLSX PS$PSVersion" {
             $WorkSheet = @( $Excel | Get-Worksheet -Name PivotTable1 )
 
             $worksheet[0].PivotTables[0].RowFields[0].Name | Should be Extension
+
+            Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
+
         }
 
         It 'should build pivot charts' {
@@ -141,6 +144,7 @@ Describe "Export-XLSX PS$PSVersion" {
 
             $WorkSheet[0].Drawings[0].ChartType.ToString() | Should be 'Pie' 
 
+            Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
         }
 
     }
@@ -291,6 +295,89 @@ Describe "Search-CellValue PS$PSVersion" {
         }
     }
 }
+
+Describe "Add-PivotTable PS$PSVersion" {
+
+    Context 'Strict mode' { 
+
+        Set-StrictMode -Version latest
+
+        It 'Should add a pivot table to an existing xlsx' {
+            Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
+            
+            Get-ChildItem C:\Windows |
+                Where {-not $_.PSIsContainer} |
+                Export-XLSX -Path $NewXLSXFile
+
+            Add-PivotTable -Path $NewXLSXFile -WorkSheetName 'Worksheet1' -PivotTableWorksheetName 'PivotTable2' -PivotRows Extension -PivotValues Length
+            
+            $Excel = New-Excel -Path $NewXLSXFile
+            $WorkSheet = @( $Excel | Get-Worksheet -Name PivotTable2 )
+
+            $worksheet[0].PivotTables[0].RowFields[0].Name | Should be Extension
+
+            Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
+        }
+        It 'Should add a pivot chart if specified' {
+            Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
+            
+            Get-ChildItem C:\Windows |
+                Where {-not $_.PSIsContainer} |
+                Export-XLSX -Path $NewXLSXFile
+
+            Add-PivotTable -Path $NewXLSXFile -WorkSheetName 'Worksheet1' -PivotTableWorksheetName 'PivotTable2' -PivotRows Extension -PivotValues Length -ChartType Area3D
+            
+            $Excel = New-Excel -Path $NewXLSXFile
+            $WorkSheet = @( $Excel | Get-Worksheet -Name PivotTable2 )
+
+            $WorkSheet[0].Drawings[0].ChartType.ToString() | Should be 'Area3D'
+
+            Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
+        }
+    }
+}
+
+Describe "Add-PivotChart PS$PSVersion" {
+
+    Context 'Strict mode' { 
+
+        Set-StrictMode -Version latest
+
+        It 'Should add a pivot chart' {
+            Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
+            
+            Get-ChildItem C:\Windows |
+                Where {-not $_.PSIsContainer} |
+                Export-XLSX -Path $NewXLSXFile -PivotRows Extension -PivotValues Length
+
+            Add-PivotChart -Path $NewXLSXFile -ChartType Pie3D
+            
+            $Excel = New-Excel -Path $NewXLSXFile
+            $WorkSheet = @( $Excel | Get-Worksheet -Name PivotTable1 )
+
+            $WorkSheet[0].Drawings[0].ChartType.ToString() | Should be 'Pie3D'
+            Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
+
+        }
+    }
+}
+
+<#
+Describe "Verb-Noun PS$PSVersion" {
+
+    Context 'Strict mode' { 
+
+        Set-StrictMode -Version latest
+
+        It 'Should do something' {
+            # $NewXLSXFile - Remove, create, and remove this as needed
+            # $ExistingXLSXFile - Use this to verify reads if desired, but other tests use it.  Please do no modify or remove.
+
+        }
+    }
+}
+#>
+
 
 Remove-Item $NewXLSXFile -force -ErrorAction SilentlyContinue
 Remove-Item $ExistingXLSXFile -force -ErrorAction SilentlyContinue

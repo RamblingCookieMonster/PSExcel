@@ -39,6 +39,9 @@
     .PARAMETER TableStyle
         Style of the table
 
+    .PARAMETER TableName
+        Name of the table, defaults to worksheet name if none provided
+
     .PARAMETER Passthru
         If specified, pass the ExcelPackage back
 
@@ -121,7 +124,7 @@
 
         [OfficeOpenXml.Table.TableStyles]$TableStyle,
 
-        [string]$TableName = "Table",
+        [string]$TableName,
 
         [switch]$Passthru
     )
@@ -179,9 +182,17 @@
                 $End = ConvertTo-ExcelCoordinate -Row $EndRow -Column $EndColumn
                 $RangeCoordinates = "$Start`:$End"
 
-                Write-Verbose "Adding table over data range '$RangeCoordinates' with name $TableName"
+                if(-not $TableName)
+                {
+                    $TableWorksheetName = $SourceWorkSheet.Name
+                }
+                else
+                {
+                    $TableWorksheetName = $TableName
+                }
 
-                $Table = $SourceWorkSheet.Tables.Add($SourceWorkSheet.Cells[$RangeCoordinates], $TableName)
+                Write-Verbose "Adding table over data range '$RangeCoordinates' with name $TableWorksheetName"
+                $Table = $SourceWorkSheet.Tables.Add($SourceWorkSheet.Cells[$RangeCoordinates], $TableWorksheetName)
 
                 if($TableStyle)
                 {

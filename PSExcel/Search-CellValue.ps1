@@ -57,7 +57,16 @@
     #>
     [cmdletbinding(DefaultParameterSetName = 'Excel')]
     param(
-        [parameter( Position = 0,
+
+
+        [parameter( Position = 1,
+                    ParameterSetName = 'Excel',
+                    Mandatory=$true,
+                    ValueFromPipeline=$true,
+                    ValueFromPipelineByPropertyName=$true)]
+        [OfficeOpenXml.ExcelPackage]$Excel,
+
+        [parameter( Position = 1,
                     ParameterSetName = 'File',
                     Mandatory=$true,
                     ValueFromPipeline=$true,
@@ -65,14 +74,7 @@
         [validatescript({Test-Path $_})]
         [string]$Path,
 
-        [parameter( Position = 0,
-                    ParameterSetName = 'Excel',
-                    Mandatory=$true,
-                    ValueFromPipeline=$true,
-                    ValueFromPipelineByPropertyName=$true)]
-        [OfficeOpenXml.ExcelPackage]$Excel,
-
-        [parameter( Position = 0,
+        [parameter( Position = 1,
                     ParameterSetName = 'Worksheet',
                     Mandatory=$true,
                     ValueFromPipeline=$true,
@@ -80,9 +82,9 @@
         [OfficeOpenXml.ExcelWorksheet]$WorkSheet,
 
         [parameter( Mandatory = $True,
-                    Position = 1)]
+                    Position = 0)]
         [scriptblock]$FilterScript,
-
+       
         $WorkSheetName,
 
         [validateset('Default','Raw','Passthru')]

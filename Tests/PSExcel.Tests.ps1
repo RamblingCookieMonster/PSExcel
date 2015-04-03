@@ -362,6 +362,28 @@ Describe "Add-PivotChart PS$PSVersion" {
     }
 }
 
+
+Describe "Set-CellValue PS$PSVersion" {
+
+    Context 'Strict mode' { 
+
+        Set-StrictMode -Version latest
+
+        It 'Should set a value' {
+            Copy-Item -Path $ExistingXLSXFile -Destination $NewXLSXFile -Force
+
+            $Excel = New-Excel -Path $NewXLSXFile
+
+            $Excel | Search-CellValue {$_ -eq "Prop2"} -As Passthru | Set-CellValue -Value "REDACTED"
+            $Excel | Save-Excel
+
+            $Result = @( Import-XLSX -Path $NewXLSXFile )
+            $Result[1].Name | Should be 'REDACTED'
+        }
+    }
+}
+
+
 <#
 Describe "Verb-Noun PS$PSVersion" {
 

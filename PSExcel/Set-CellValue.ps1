@@ -6,10 +6,6 @@
     .DESCRIPTION
         Set the value of a specific cell or range
 
-        BETA NOTE:
-            This is not a fully fledged function yet.
-            Ideally we should allow the specification of a Worksheet (or lower level), and the string based range to set.
-
         NOTE:
             Each time you call this function, you need to save and re-create your Excel Object.
             If you attempt to modify the Excel object, save, modify, and save a second time, it will fail.

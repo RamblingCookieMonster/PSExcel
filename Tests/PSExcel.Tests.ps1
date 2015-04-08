@@ -392,7 +392,31 @@ Describe "Set-CellValue PS$PSVersion" {
     }
 }
 
+Describe "Get-CellValue PS$PSVersion" {
 
+    Context 'Strict mode' { 
+
+        Set-StrictMode -Version latest
+
+        It 'Should get a value from an Excel object' {
+            Copy-Item -Path $ExistingXLSXFile -Destination $NewXLSXFile -Force
+
+            $Excel = New-Excel -Path $NewXLSXFile
+
+            $Result = @($Excel | Get-CellValue -Coordinates "A2:A3")
+            $Result[0].Name | Should be 'Prop1'
+            $Result[1].Name | Should be 'Prop2'
+            $Result.Count | Should be 2
+        }
+        It 'Should get a value from an Excel file' {
+            Copy-Item -Path $ExistingXLSXFile -Destination $NewXLSXFile -Force
+
+            $Result = @( Get-CellValue -Path $NewXLSXFile -Coordinates "B2:B2" )
+            $Result[0].Val | Should be 944041859
+            $Result.Count | Should be 1
+        }
+    }
+}
 <#
 Describe "Verb-Noun PS$PSVersion" {
 

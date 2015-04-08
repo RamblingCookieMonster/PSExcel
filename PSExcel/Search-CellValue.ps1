@@ -57,8 +57,6 @@
     #>
     [cmdletbinding(DefaultParameterSetName = 'Excel')]
     param(
-
-
         [parameter( Position = 1,
                     ParameterSetName = 'Excel',
                     Mandatory=$true,
@@ -190,6 +188,11 @@
                         }
                     }
                 }
+            }
+
+            if($PSBoundParameters.ContainsKey('Path'))
+            {
+                $Sheet.Dispose()
             }
         }
     }

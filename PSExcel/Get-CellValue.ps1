@@ -6,6 +6,8 @@
     .DESCRIPTION
         Get cell data from Excel
 
+        BETA NOTE:  Broken in PowerShell 2.  Fixing shortly.
+
     .PARAMETER Path
         Path to an xlsx file to get cells from
 

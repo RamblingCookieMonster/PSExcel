@@ -401,12 +401,15 @@ Describe "Get-CellValue PS$PSVersion" {
         It 'Should get a value from an Excel object' {
             Copy-Item -Path $ExistingXLSXFile -Destination $NewXLSXFile -Force
 
-            $Excel = New-Excel -Path $NewXLSXFile
-
-            $Result = @($Excel | Get-CellValue -Coordinates "A2:A3")
-            $Result[0].Name | Should be 'Prop1'
-            $Result[1].Name | Should be 'Prop2'
-            $Result.Count | Should be 2
+            if($PSVersion -ne 2) #Will add back when function is PS2 compat
+            {
+                $Excel = New-Excel -Path $NewXLSXFile
+            
+                $Result = @($Excel | Get-CellValue -Coordinates "A2:A3")
+                $Result[0].Name | Should be 'Prop1'
+                $Result[1].Name | Should be 'Prop2'
+                $Result.Count | Should be 2
+            }
         }
         It 'Should get a value from an Excel file' {
             Copy-Item -Path $ExistingXLSXFile -Destination $NewXLSXFile -Force

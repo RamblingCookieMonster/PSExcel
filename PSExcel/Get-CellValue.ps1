@@ -6,8 +6,6 @@
     .DESCRIPTION
         Get cell data from Excel
 
-        BETA NOTE:  Broken in PowerShell 2.  Fixing shortly.
-
     .PARAMETER Path
         Path to an xlsx file to get cells from
 
@@ -183,10 +181,10 @@
             }
             else
             {
-                $Header = foreach ($Column in $ColumnStart..$ColumnEnd)
+                $Header = @( foreach ($Column in $ColumnStart..$ColumnEnd)
                 {
                     $worksheet.Cells.Item(1,$Column).Value
-                }
+                } )
             }
 
             [string[]]$SelectedHeaders = @( $Header | select -Unique )
@@ -203,7 +201,9 @@
                     $Name  = $Header[$HeaderCol]
                     $Value = $WorkSheet.Cells.Item($Row,$Column).Value
                     $HeaderCol++
-                                        
+
+                    Write-Debug "Row: $Row, Column: $Column, HeaderCol: $HeaderCol, Name: $Name, Value = $Value"
+                                   
                     #Handle dates, they're too common to overlook... Could use help, not sure if this is the best regex to use?
                     $Format = $WorkSheet.Cells.Item($Row,$Column).style.numberformat.format
                     if($Format -match '\w{1,4}/\w{1,2}/\w{1,4}( \w{1,2}:\w{1,2})?')
@@ -227,10 +227,6 @@
                     }
                 }
                 New-Object -TypeName PSObject -Property $RowData | Select -Property $SelectedHeaders
-            }
-            if($PSBoundParameters.ContainsKey('Path'))
-            {
-                $Worksheet.Dispose()
             }
         }
     }

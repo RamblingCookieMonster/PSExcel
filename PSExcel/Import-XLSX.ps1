@@ -120,10 +120,10 @@
             }
             else
             {
-                $Header = foreach ($Column in 1..$Columns)
+                $Header = @( foreach ($Column in 1..$Columns)
                 {
                     $worksheet.Cells.Item(1,$Column).Value
-                }
+                } )
             }
 
             [string[]]$SelectedHeaders = @( $Header | select -Unique )
@@ -138,6 +138,8 @@
                     $Name  = $Header[$Column]
                     $Value = $worksheet.Cells.Item($Row, ($Column+1)).Value
                     
+                    Write-Debug "Row: $Row, Column: $Column, Name: $Name, Value = $Value"
+
                     #Handle dates, they're too common to overlook... Could use help, not sure if this is the best regex to use?
                     $Format = $worksheet.Cells.Item($Row, ($Column+1)).style.numberformat.format
                     if($Format -match '\w{1,4}/\w{1,2}/\w{1,4}( \w{1,2}:\w{1,2})?')

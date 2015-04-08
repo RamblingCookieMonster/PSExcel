@@ -369,7 +369,7 @@ Describe "Set-CellValue PS$PSVersion" {
 
         Set-StrictMode -Version latest
 
-        It 'Should set a value' {
+        It 'Should set a value based on CellRange' {
             Copy-Item -Path $ExistingXLSXFile -Destination $NewXLSXFile -Force
 
             $Excel = New-Excel -Path $NewXLSXFile
@@ -380,6 +380,15 @@ Describe "Set-CellValue PS$PSVersion" {
             $Result = @( Import-XLSX -Path $NewXLSXFile )
             $Result[1].Name | Should be 'REDACTED'
         }
+        It 'Should set a value based on Path' {
+            Copy-Item -Path $ExistingXLSXFile -Destination $NewXLSXFile -Force
+
+            Set-CellValue -Coordinates "A2:A3" -Path $NewXLSXFile -Value "REDACTED"
+            $Result = @( Import-XLSX -Path $NewXLSXFile )
+            $Result[0].Name | Should be 'REDACTED'
+            $Result[1].Name | Should be 'REDACTED'
+        }
+
     }
 }
 

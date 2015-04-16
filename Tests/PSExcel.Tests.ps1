@@ -417,6 +417,37 @@ Describe "Get-CellValue PS$PSVersion" {
         }
     }
 }
+
+Describe "Join-Worksheet PS$PSVersion" {
+
+    Context 'Strict mode' { 
+
+        Set-StrictMode -Version latest
+
+        It 'Should join worksheets' {
+
+            #Get the worksheets to join:
+                $JoinPath = "$PSScriptRoot\JoinTest.xlsx"
+                $Excel = New-Excel -Path $JoinPath
+                $LeftWorksheet = Get-Worksheet -Excel $Excel -Name 'Left'
+                $RightWorksheet = Get-WorkSheet -Excel $Excel -Name 'Right'
+
+            #We have the data - join it where Left.Name = Right.Manager
+                Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
+                Join-Worksheet -Path $NewXLSXFile -LeftWorksheet $LeftWorksheet -RightWorksheet $RightWorksheet -LeftJoinColumn Name -RightJoinColumn Manager
+                $Excel | Close-Excel
+
+            #Verify the output:
+                $Result = @( Import-XLSX -Path $NewXLSXFile )
+
+                $Result[0].Name | Should Be 'jsmith1'
+                $Result[0].Manager | Should BeNullOrEmpty
+                $Result[3].Manager | Should Be 'jsmith4'
+        }
+    }
+}
+
+
 <#
 Describe "Verb-Noun PS$PSVersion" {
 
@@ -436,3 +467,11 @@ Describe "Verb-Noun PS$PSVersion" {
 
 Remove-Item $NewXLSXFile -force -ErrorAction SilentlyContinue
 Remove-Item $ExistingXLSXFile -force -ErrorAction SilentlyContinue
+
+
+
+
+
+
+
+        

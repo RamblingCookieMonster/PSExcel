@@ -26,7 +26,7 @@
         Excel package to write joined worksheet to.  We do not save this.
 
     .PARAMETER DestinationWorksheetName
-        Name the worksheet you are importing to
+        Name the worksheet you are adding joined data to
 
     .PARAMETER LeftWorksheet
         Left worksheet to join
@@ -122,6 +122,14 @@
 
     .PARAMETER TableStyle
         If specified, add table style
+
+    .PARAMETER Force
+        If specified, and Path parameter is used, remove existing file if it is found
+
+        If force is not specified and an existing XLSX is found, we try to add the worksheet to it
+
+    .PARAMETER Passthru
+        If specified, and Excel parameter is used, return Excel package object
 
     .EXAMPLE
 
@@ -239,7 +247,9 @@
 
         [switch]$AutoFit,
 
-        [switch]$Force
+        [switch]$Force,
+        
+        [switch]$Passthru
     )
     begin
     {
@@ -309,5 +319,9 @@
         }
 
         Export-XLSX @ExportParams
+        if($PSBoundParameters.ContainsKey('Excel') -and $Passthru)
+        {
+            $Excel
+        }
     }
 }

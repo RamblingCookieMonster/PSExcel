@@ -191,7 +191,13 @@
 
             Write-Verbose "Found headers $Header"
 
-            foreach($Row in $RowStart..$RowEnd)
+
+            #Skip headers...
+            if($RowStart -eq 1 -and $RowEnd -ne 1)
+            {
+                $RowStart += 1
+            }
+            foreach($Row in ($RowStart)..$RowEnd)
             {
                 $RowData = @{}
                 $HeaderCol = 0

@@ -108,9 +108,13 @@
     .FUNCTIONALITY
         Excel
     #>
-    [CmdletBinding(DefaultParameterSetName='NoPivot')]
+    [CmdletBinding(DefaultParameterSetName='Path-NoPivot')]
     param(
-        [parameter( Position = 0,
+        [parameter( ParameterSetName='Path-NoPivot',
+                    Position = 0,
+                    Mandatory=$true )]
+        [parameter( ParameterSetName='Path-Pivot',
+                    Position = 0,
                     Mandatory=$true )]
         [ValidateScript({
             $Parent = Split-Path $_ -Parent
@@ -122,6 +126,14 @@
         })]
         [string]$Path,
 
+        [parameter( ParameterSetName='Excel-NoPivot',
+                    Position = 0,
+                    Mandatory=$true )]
+        [parameter( ParameterSetName='Excel-Pivot',
+                    Position = 0,
+                    Mandatory=$true )]
+        [OfficeOpenXml.ExcelPackage]$Excel,
+
         [parameter( Position = 1,
                     Mandatory=$true,
                     ValueFromPipeline=$true,
@@ -132,16 +144,20 @@
 
         [string]$WorksheetName = "Worksheet1",
 
-        [parameter( ParameterSetName = 'Pivot')]
+        [parameter( ParameterSetName = 'Excel-Pivot')]
+        [parameter( ParameterSetName = 'Path-Pivot')]
         [string[]]$PivotRows,
 
-        [parameter( ParameterSetName = 'Pivot')]
+        [parameter( ParameterSetName = 'Excel-Pivot')]
+        [parameter( ParameterSetName = 'Path-Pivot')]
         [string[]]$PivotColumns,
 
-        [parameter( ParameterSetName = 'Pivot')]
+        [parameter( ParameterSetName = 'Excel-Pivot')]
+        [parameter( ParameterSetName = 'Path-Pivot')]
         [string[]]$PivotValues,
 
-        [parameter( ParameterSetName = 'Pivot')]
+        [parameter( ParameterSetName = 'Excel-Pivot')]
+        [parameter( ParameterSetName = 'Path-Pivot')]
         [OfficeOpenXml.Drawing.Chart.eChartType]$ChartType,
 
         [switch]$Table,
@@ -154,27 +170,32 @@
     )
     begin
     {
-        if ( Test-Path $Path )
+        if ( $PSBoundParameters.ContainsKey('Path'))
         {
-            if($Force)
+            if ( Test-Path $Path ) 
             {
-                Try
+                if($Force)
                 {
-                    Remove-Item -Path $Path -Force -Confirm:$False
+                    Try
+                    {
+                        Remove-Item -Path $Path -Force -Confirm:$False
+                    }
+                    Catch
+                    {
+                        Throw "'$Path' exists and could not be removed: $_"
+                    }
                 }
-                Catch
+                else
                 {
-                    Throw "'$Path' exists and could not be removed: $_"
+                    Write-Verbose "'$Path' exists.  Use -Force to overwrite.  Attempting to add sheet to existing workbook."
                 }
             }
-            else
-            {
-                Write-Verbose "'$Path' exists.  Use -Force to overwrite.  Attempting to add sheet to existing workbook."
-            }
-        }
 
-        #Resolve relative paths... Thanks Oisin! http://stackoverflow.com/a/3040982/3067642
-        $Path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+            #Resolve relative paths... Thanks Oisin! http://stackoverflow.com/a/3040982/3067642
+            $Path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+            $Excel = New-Object OfficeOpenXml.ExcelPackage($Path)
+
+        }
 
         Write-Verbose "PSBoundParameters = $($PSBoundParameters | Out-String)"
 
@@ -202,7 +223,6 @@
     }
     end
     {
-
         #Deal with headers
             $ExistingHeader = @(
 
@@ -228,13 +248,12 @@
         #initialize stuff
             Try
             {
-                $Excel = New-Object OfficeOpenXml.ExcelPackage($Path)
                 $Workbook = $Excel.Workbook
                 $WorkSheet = $Workbook.Worksheets.Add($WorkSheetName)
             }
             Catch
             {
-                Throw "Failed to initialize Excel, Workbook, or Worksheet: $_"
+                Throw "Failed to initialize Workbook or Worksheet: $_"
             }
 
         #Set those headers
@@ -308,7 +327,7 @@
             }
 
             # Any pivot params specified?  add a pivot!
-            if($PSCmdlet.ParameterSetName -eq 'Pivot')
+            if($PSCmdlet.ParameterSetName -like '*-Pivot')
             {
                 $Params = @{}
                 if($PivotRows)    {$Params.Add('PivotRows',$PivotRows)}
@@ -328,6 +347,9 @@
                 $WorkSheet.Cells[$WorkSheet.Dimension.Address].AutoFitColumns()
             }
 
-            $Excel.SaveAs($Path)
+            if($PSBoundParameters.ContainsKey('Path'))
+            {
+                $Excel.SaveAs($Path)
+            }
     }
 }

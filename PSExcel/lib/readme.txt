@@ -1,4 +1,4 @@
-EPPlus 4.0.3
+EPPlus 4.0.4
 
 Visit epplus.codeplex.com for the latest information
 
@@ -92,4 +92,9 @@ Release Candidare changes
 4.0.3 Fixes
 * Added compilation directive for MONO (Thanks Danny)
 * Added functions IfError, Char, Error.Type, Degrees, Fixed, IsNonText, IfNa and SumIfs
+* And fixed a lot of issues. See http://epplus.codeplex.com/SourceControl/list/changesets for more details
+
+4.0.4 Fixes
+* Added functions Daverage, Dvar Dvarp, DMax, DMin DSum,  DGet, DCount and DCountA 
+* Exposed the formula parser logging functionality via FormulaParserManager.
 * And fixed a lot of issues. See http://epplus.codeplex.com/SourceControl/list/changesets for more details

@@ -5892,6 +5892,11 @@
             Drawing object used for comments
             </summary>
         </member>
+        <member name="P:OfficeOpenXml.Drawing.Vml.ExcelVmlDrawingBase.AlternativeText">
+            <summary>
+            Alternative text to be displayed instead of a graphic.
+            </summary>
+        </member>
         <member name="P:OfficeOpenXml.Drawing.Vml.ExcelVmlDrawingPicture.Position">
             <summary>
             Position ID
@@ -8104,7 +8109,8 @@
         </member>
         <member name="P:OfficeOpenXml.ExcelRangeBase.RichText">
             <summary>
-            Cell value is richtext formated. 
+            Cell value is richtext formatted. 
+            Richtext-property only apply to the left-top cell of the range.
             </summary>
         </member>
         <member name="P:OfficeOpenXml.ExcelRangeBase.Comment">
@@ -9045,10 +9051,66 @@
             <param name="formula"></param>
             <returns></returns>
         </member>
+        <member name="M:OfficeOpenXml.FormulaParsing.FormulaParserManager.AttachLogger(OfficeOpenXml.FormulaParsing.Logging.IFormulaParserLogger)">
+            <summary>
+            Attaches a logger to the <see cref="T:OfficeOpenXml.FormulaParsing.FormulaParser"/>.
+            </summary>
+            <param name="logger">An instance of <see cref="T:OfficeOpenXml.FormulaParsing.Logging.IFormulaParserLogger"/></param>
+            <see cref="T:OfficeOpenXml.FormulaParsing.Logging.LoggerFactory"/>
+        </member>
+        <member name="M:OfficeOpenXml.FormulaParsing.FormulaParserManager.AttachLogger(System.IO.FileInfo)">
+            <summary>
+            Attaches a logger to the formula parser that produces output to the supplied logfile.
+            </summary>
+            <param name="logfile"></param>
+        </member>
+        <member name="M:OfficeOpenXml.FormulaParsing.FormulaParserManager.DetachLogger">
+            <summary>
+            Detaches any attached logger from the formula parser.
+            </summary>
+        </member>
         <member name="T:OfficeOpenXml.FormulaParsing.Logging.IFormulaParserLogger">
             <summary>
             Used for logging during FormulaParsing
             </summary>
+        </member>
+        <member name="M:OfficeOpenXml.FormulaParsing.Logging.IFormulaParserLogger.Log(OfficeOpenXml.FormulaParsing.ParsingContext,System.Exception)">
+            <summary>
+            Called each time an exception occurs during formula parsing.
+            </summary>
+            <param name="context"></param>
+            <param name="ex"></param>
+        </member>
+        <member name="M:OfficeOpenXml.FormulaParsing.Logging.IFormulaParserLogger.Log(OfficeOpenXml.FormulaParsing.ParsingContext,System.String)">
+            <summary>
+            Called each time information should be logged during formula parsing.
+            </summary>
+            <param name="context"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:OfficeOpenXml.FormulaParsing.Logging.IFormulaParserLogger.Log(System.String)">
+            <summary>
+            Called to log a message outside the parsing context.
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="M:OfficeOpenXml.FormulaParsing.Logging.IFormulaParserLogger.LogCellCounted">
+            <summary>
+            Called each time a cell within the calc chain is accessed during formula parsing.
+            </summary>
+        </member>
+        <member name="M:OfficeOpenXml.FormulaParsing.Logging.IFormulaParserLogger.LogFunction(System.String)">
+            <summary>
+            Called each time a function is called during formula parsing.
+            </summary>
+            <param name="func"></param>
+        </member>
+        <member name="M:OfficeOpenXml.FormulaParsing.Logging.IFormulaParserLogger.LogFunction(System.String,System.Int64)">
+            <summary>
+            Some functions measure performance, if so this function will be called.
+            </summary>
+            <param name="func"></param>
+            <param name="milliseconds"></param>
         </member>
         <member name="T:OfficeOpenXml.FormulaParsing.Logging.LoggerFactory">
             <summary>
@@ -26443,7 +26505,15 @@
             <param name="t"></param>
             <returns></returns>
         </member>
-        <member name="M:OfficeOpenXml.Utils.ConvertUtil.ExcelEncodeString(System.Text.StringBuilder,System.String)">
+        <member name="M:OfficeOpenXml.Utils.ConvertUtil.ExcelEncodeString(System.Text.StringBuilder,System.String,System.Boolean)">
+            <summary>
+            Return true if preserve space attribute is set.
+            </summary>
+            <param name="sb"></param>
+            <param name="t"></param>
+            <returns></returns>
+        </member>
+        <member name="M:OfficeOpenXml.Utils.ConvertUtil.ExcelEncodeString(System.String)">
             <summary>
             Return true if preserve space attribute is set.
             </summary>
@@ -27405,7 +27475,7 @@
         </member>
         <member name="P:OfficeOpenXml.OfficeProperties.Application">
             <summary>
-            Gets the Application property of the document (extended property)
+            Gets/Set the Application property of the document (extended property)
             </summary>
         </member>
         <member name="P:OfficeOpenXml.OfficeProperties.HyperlinkBase">
@@ -27415,7 +27485,7 @@
         </member>
         <member name="P:OfficeOpenXml.OfficeProperties.AppVersion">
             <summary>
-            Gets the AppVersion property of the document (extended property)
+            Gets/Set the AppVersion property of the document (extended property)
             </summary>
         </member>
         <member name="P:OfficeOpenXml.OfficeProperties.Company">

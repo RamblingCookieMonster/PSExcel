@@ -268,7 +268,7 @@
                     $WorkSheet=$Excel.Workbook.Worksheets | Where-Object {$_.Name -like $WorkSheetName}
                     $WorkSheet.Cells[$WorkSheet.Dimension.Start.Row, $WorkSheet.Dimension.Start.Column, $WorkSheet.Dimension.End.Row, $WorkSheet.Dimension.End.Column].Clear();        
                 }
-				else 
+                else
                 {
                     $WorkSheet = $Workbook.Worksheets.Add($WorkSheetName)
                 }

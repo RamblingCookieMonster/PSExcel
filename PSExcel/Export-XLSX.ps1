@@ -42,12 +42,24 @@
     .PARAMETER Force
         If file exists, overwrite it.  Otherwise, we try to add a new worksheet.
 
+    .PARAMETER ClearSheet
+        If worksheet exists, clear it.  Otherwise, we try to add a new worksheet.
+
     .EXAMPLE
         $Files = Get-ChildItem C:\ -File
 
         Export-XLSX -Path C:\Files.xlsx -InputObject $Files
 
         Export file listing to C:\Files.xlsx
+
+    .EXAMPLE
+        $Files = Get-ChildItem C:\ -File
+		
+		$Worksheet = 'Files'
+
+        Export-XLSX -Path C:\Files.xlsx -InputObject $Files -WorksheetName $Worksheet -ClearSheet
+
+        Export file listing to C:\Files.xlsx to the worksheet named "Files".  If it exists already, clear the sheet then import the data.
 
     .EXAMPLE
 
@@ -166,7 +178,9 @@
 
         [switch]$AutoFit,
 
-        [switch]$Force
+        [switch]$Force,
+		
+		[switch]$ClearSheet
     )
     begin
     {
@@ -248,12 +262,22 @@
         #initialize stuff
             Try
             {
+                $Excel = New-Object OfficeOpenXml.ExcelPackage($Path)
                 $Workbook = $Excel.Workbook
-                $WorkSheet = $Workbook.Worksheets.Add($WorkSheetName)
+                if ($ClearSheet)
+					{
+						$WorkSheet=$Excel.Workbook.Worksheets | Where-Object {$_.Name -like $WorkSheetName}
+						$WorkSheet.Cells[$WorkSheet.Dimension.Start.Row, $WorkSheet.Dimension.Start.Column, $WorkSheet.Dimension.End.Row, $WorkSheet.Dimension.End.Column].Clear();        
+					}
+				else 
+					{
+						$WorkSheet = $Workbook.Worksheets.Add($WorkSheetName)
+					}
+				
             }
             Catch
             {
-                Throw "Failed to initialize Workbook or Worksheet: $_"
+                Throw "Failed to initialize Excel, Workbook, or Worksheet. Try -ClearSheet switch if worksheet already exists. : $_"
             }
 
         #Set those headers

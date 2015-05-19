@@ -265,12 +265,12 @@
                 $Workbook = $Excel.Workbook
                 if ($ClearSheet -and (Test-Path $Path) )
                 {
-                	$WorkSheet=$Excel.Workbook.Worksheets | Where-Object {$_.Name -like $WorkSheetName}
-                	$WorkSheet.Cells[$WorkSheet.Dimension.Start.Row, $WorkSheet.Dimension.Start.Column, $WorkSheet.Dimension.End.Row, $WorkSheet.Dimension.End.Column].Clear();        
+                    $WorkSheet=$Excel.Workbook.Worksheets | Where-Object {$_.Name -like $WorkSheetName}
+                    $WorkSheet.Cells[$WorkSheet.Dimension.Start.Row, $WorkSheet.Dimension.Start.Column, $WorkSheet.Dimension.End.Row, $WorkSheet.Dimension.End.Column].Clear();        
                 }
 				else 
                 {
-                	$WorkSheet = $Workbook.Worksheets.Add($WorkSheetName)
+                    $WorkSheet = $Workbook.Worksheets.Add($WorkSheetName)
                 }
             }
             Catch

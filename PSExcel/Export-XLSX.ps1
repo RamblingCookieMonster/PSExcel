@@ -57,9 +57,9 @@
 		
 		$Worksheet = 'Files'
 
-        Export-XLSX -Path C:\Files.xlsx -InputObject $Files -WorksheetName $Worksheet -ClearSheet
+        Export-XLSX -Path C:\temp\Files.xlsx -InputObject $Files -WorksheetName $Worksheet -ClearSheet
 
-        Export file listing to C:\Files.xlsx to the worksheet named "Files".  If it exists already, clear the sheet then import the data.
+        Export file listing to C:\temp\Files.xlsx to the worksheet named "Files".  If it exists already, clear the sheet then import the data.
 
     .EXAMPLE
 
@@ -264,7 +264,7 @@
             {
                 $Excel = New-Object OfficeOpenXml.ExcelPackage($Path)
                 $Workbook = $Excel.Workbook
-                if ($ClearSheet)
+                if ($ClearSheet -and (Test-Path $Path) )
 					{
 						$WorkSheet=$Excel.Workbook.Worksheets | Where-Object {$_.Name -like $WorkSheetName}
 						$WorkSheet.Cells[$WorkSheet.Dimension.Start.Row, $WorkSheet.Dimension.Start.Column, $WorkSheet.Dimension.End.Row, $WorkSheet.Dimension.End.Column].Clear();        

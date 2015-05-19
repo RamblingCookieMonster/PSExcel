@@ -207,7 +207,6 @@
 
             #Resolve relative paths... Thanks Oisin! http://stackoverflow.com/a/3040982/3067642
             $Path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
-            $Excel = New-Object OfficeOpenXml.ExcelPackage($Path)
 
         }
 
@@ -262,18 +261,17 @@
         #initialize stuff
             Try
             {
-                $Excel = New-Object OfficeOpenXml.ExcelPackage($Path)
+                $Excel = New-Object OfficeOpenXml.ExcelPackage($Path) -ErrorAction Stop
                 $Workbook = $Excel.Workbook
                 if ($ClearSheet -and (Test-Path $Path) )
-					{
-						$WorkSheet=$Excel.Workbook.Worksheets | Where-Object {$_.Name -like $WorkSheetName}
-						$WorkSheet.Cells[$WorkSheet.Dimension.Start.Row, $WorkSheet.Dimension.Start.Column, $WorkSheet.Dimension.End.Row, $WorkSheet.Dimension.End.Column].Clear();        
-					}
+                {
+                	$WorkSheet=$Excel.Workbook.Worksheets | Where-Object {$_.Name -like $WorkSheetName}
+                	$WorkSheet.Cells[$WorkSheet.Dimension.Start.Row, $WorkSheet.Dimension.Start.Column, $WorkSheet.Dimension.End.Row, $WorkSheet.Dimension.End.Column].Clear();        
+                }
 				else 
-					{
-						$WorkSheet = $Workbook.Worksheets.Add($WorkSheetName)
-					}
-				
+                {
+                	$WorkSheet = $Workbook.Worksheets.Add($WorkSheetName)
+                }
             }
             Catch
             {

@@ -445,7 +445,7 @@ Describe "Join-Worksheet PS$PSVersion" {
                 $ExpectedNames = echo jsmith1, jsmith2, jsmith3, 'Department 4', 'Department 5' 
                 
                 @(Compare-Object $Names $ExpectedNames).count | Should Be 0
-                @($Result | ?{$_.Name -eq 'jsmith2'})[0].Manager -like $null | Should $true
+                @($Result | ?{$_.Name -eq 'jsmith2'})[0].Manager -like $null | Should Be $true
         }
     }
 }

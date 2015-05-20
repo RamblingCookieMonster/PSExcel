@@ -443,8 +443,7 @@ Describe "Join-Worksheet PS$PSVersion" {
                 $Result.count | Should Be 5
                 $Names = $Result | Select -ExpandProperty Name
                 $ExpectedNames = echo jsmith1, jsmith2, jsmith3, 'Department 4', 'Department 5' 
-                compare-object $($Result | Select -ExpandProperty Name) $Names | Should BeNullOrEmpty
-                $Result | ?{$_.Name -eq 'jsmith2'} | Select -ExpandProperty Manager | Should BeNullOrEmpty
+                
         }
     }
 }

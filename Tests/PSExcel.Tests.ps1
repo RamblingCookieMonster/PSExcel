@@ -440,9 +440,11 @@ Describe "Join-Worksheet PS$PSVersion" {
             #Verify the output:
                 $Result = @( Import-XLSX -Path $NewXLSXFile )
 
-                $Result[0].Name | Should Be 'jsmith1'
-                $Result[0].Manager | Should BeNullOrEmpty
-                $Result[3].Manager | Should Be 'jsmith4'
+                $Result.count | Should Be 5
+                $Names = $Result | Select -ExpandProperty Name
+                $ExpectedNames = echo jsmith1, jsmith2, jsmith3, 'Department 4', 'Department 5' 
+                compare-object $($Result | Select -ExpandProperty Name) $Names | Should BeNullOrEmpty
+                $Result | ?{$_.Name -eq 'jsmith2'} | Select -ExpandProperty Manager | Should BeNullOrEmpty
         }
     }
 }

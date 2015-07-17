@@ -29,6 +29,9 @@ Caveats:
     # Unblock the zip
     # Extract the PSExcel folder to a module path (e.g. $env:USERPROFILE\Documents\WindowsPowerShell\Modules\)
 
+    #Simple alternative, if you have PowerShell 5, or the PowerShellGet module:
+        Install-Module PSExcel
+
 # Import the module.
     Import-Module PSExcel    #Alternatively, Import-Module \\Path\To\PSExcel
 

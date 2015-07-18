@@ -102,14 +102,22 @@ Describe "Export-XLSX PS$PSVersion" {
 
         It 'should create a file' {
             $Files | Export-XLSX -Path $NewXLSXFile
-
             Test-Path $NewXLSXFile | Should Be $True
-
         }
 
         It 'should add the correct number of rows' {
             $ExportedData = Import-XLSX -Path $NewXLSXFile
             $Files.Count | Should be $ExportedData.count
+        }
+
+        It 'should append to a file' {
+            $Files | Export-XLSX -Path $NewXLSXFile -Append
+            Test-Path $NewXLSXFile | Should Be $True
+        }
+
+        It 'should append the correct number of rows' {
+            $ExportedData = Import-XLSX -Path $NewXLSXFile
+            ( $Files.Count * 2 ) | Should be $ExportedData.count
         }
 
         It 'should build pivot tables' {
@@ -121,9 +129,7 @@ Describe "Export-XLSX PS$PSVersion" {
                 Export-XLSX -Path $NewXLSXFile -PivotRows Extension -PivotValues Length
 
             $Excel = New-Excel -Path $NewXLSXFile
-            
             $WorkSheet = @( $Excel | Get-Worksheet -Name PivotTable1 )
-
             $worksheet[0].PivotTables[0].RowFields[0].Name | Should be Extension
 
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
@@ -139,14 +145,11 @@ Describe "Export-XLSX PS$PSVersion" {
                 Export-XLSX -Path $NewXLSXFile -PivotRows Extension -PivotValues Length -ChartType Pie
 
             $Excel = New-Excel -Path $NewXLSXFile
-            
             $WorkSheet = @( $Excel | Get-Worksheet -Name PivotTable1 )
-
             $WorkSheet[0].Drawings[0].ChartType.ToString() | Should be 'Pie' 
 
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
         }
-
     }
 }
 

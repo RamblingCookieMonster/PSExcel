@@ -39,6 +39,11 @@
     .PARAMETER TableStyle
         If specified, add table style
 
+    .PARAMETER Append
+        If specified, append to existing worksheet.
+
+        We don't check header names, but header count must match.
+
     .PARAMETER Force
         If file exists, overwrite it.  Otherwise, we try to add a new worksheet.
 
@@ -54,7 +59,7 @@
 
     .EXAMPLE
         $Files = Get-ChildItem C:\ -File
-		
+
 		$Worksheet = 'Files'
 
         Export-XLSX -Path C:\temp\Files.xlsx -InputObject $Files -WorksheetName $Worksheet -ClearSheet
@@ -105,6 +110,37 @@
 	# Get all processes
 	# Create an xlsx
 	# Create a table with the Medium1 style and all cells autofit on the 'process' worksheet
+
+    .EXAMPLE
+
+    #
+    # This example illustrates appending data
+
+        1..10 | Foreach-Object {
+            New-Object -typename PSObject -Property @{
+                Something = "Prop$_"
+                Value = Get-Random
+            }
+        } |
+            Select-Object Something, Value |
+            Export-XLSX -Path C:\Random.xlsx -Force
+
+        # Generate data
+        # Send it to Export-XLSX
+        # Overwrite C:\random.xlsx if it exists
+
+        1..5 | Foreach-Object {
+            New-Object -typename PSObject -Property @{
+                Something = "Prop$_"
+                Value = Get-Random
+            }
+        } |
+            Select-Object Something, Value |
+            Export-XLSX -Path C:\Random.xlsx -Append
+
+        # Generate data
+        # Send it to Export-XLSX
+        # Append to C:\random.xlsx
 
     .NOTES
         Thanks to Doug Finke for his example
@@ -178,8 +214,10 @@
 
         [switch]$AutoFit,
 
+        [switch]$Append,
+
         [switch]$Force,
-		
+
 		[switch]$ClearSheet
     )
     begin
@@ -188,7 +226,11 @@
         {
             if ( Test-Path $Path ) 
             {
-                if($Force)
+                if($Append)
+                {
+                    Write-Verbose "'$Path' exists. Appending data"
+                }
+                elseif($Force)
                 {
                     Try
                     {
@@ -201,13 +243,12 @@
                 }
                 else
                 {
-                    Write-Verbose "'$Path' exists.  Use -Force to overwrite.  Attempting to add sheet to existing workbook."
+                    Write-Verbose "'$Path' exists. Use -Force to overwrite. Attempting to add sheet to existing workbook"
                 }
             }
 
             #Resolve relative paths... Thanks Oisin! http://stackoverflow.com/a/3040982/3067642
             $Path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
-
         }
 
         Write-Verbose "PSBoundParameters = $($PSBoundParameters | Out-String)"
@@ -217,7 +258,6 @@
         {
             [System.Collections.ArrayList]$AllData = @()
         }
-
     }
     process
     {
@@ -259,14 +299,28 @@
             }
 
         #initialize stuff
+            $RowIndex = 2
             Try
             {
                 $Excel = New-Object OfficeOpenXml.ExcelPackage($Path) -ErrorAction Stop
                 $Workbook = $Excel.Workbook
-                if ($ClearSheet -and (Test-Path $Path) )
+                if (($Append -or $ClearSheet) -and (Test-Path $Path) )
                 {
                     $WorkSheet=$Excel.Workbook.Worksheets | Where-Object {$_.Name -like $WorkSheetName}
-                    $WorkSheet.Cells[$WorkSheet.Dimension.Start.Row, $WorkSheet.Dimension.Start.Column, $WorkSheet.Dimension.End.Row, $WorkSheet.Dimension.End.Column].Clear();        
+                    if($ClearSheet)
+                    {
+                        $WorkSheet.Cells[$WorkSheet.Dimension.Start.Row, $WorkSheet.Dimension.Start.Column, $WorkSheet.Dimension.End.Row, $WorkSheet.Dimension.End.Column].Clear()
+                    }
+                    if($Append)
+                    {
+                        $RealHeaderCount = $WorkSheet.Dimension.Columns
+                        if($Header.count -ne $RealHeaderCount)
+                        {
+                            $Excel.Dispose()
+                            Throw "Found $RealHeaderCount existing headers, provided data has $($Header.count)."
+                        }
+                        $RowIndex = 1 + $Worksheet.Dimension.Rows
+                    }
                 }
                 else
                 {
@@ -275,17 +329,19 @@
             }
             Catch
             {
-                Throw "Failed to initialize Excel, Workbook, or Worksheet. Try -ClearSheet switch if worksheet already exists. : $_"
+                Throw "Failed to initialize Excel, Workbook, or Worksheet. Try -ClearSheet switch if worksheet already exists:`n`n_"
             }
 
-        #Set those headers
-            for ($ColumnIndex = 1; $ColumnIndex -le $Header.count; $ColumnIndex++)
+        #Set those headers if we aren't appending
+            if(-not $Append)
             {
-                $WorkSheet.SetValue(1, $ColumnIndex, $Header[$ColumnIndex - 1])
+                for ($ColumnIndex = 1; $ColumnIndex -le $Header.count; $ColumnIndex++)
+                {
+                    $WorkSheet.SetValue(1, $ColumnIndex, $Header[$ColumnIndex - 1])
+                }
             }
 
         #Write the data...
-            $RowIndex = 2
             foreach($RowData in $AllData)
             {
                 Write-Verbose "Working on object:`n$($RowData | Out-String)"

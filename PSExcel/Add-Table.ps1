@@ -49,11 +49,11 @@
 
         Get-ChildItem C:\ -file | Export-XLSX -Path C:\temp\files.xlsx
 
-        Add-Table -Path C:\Temp\files.xlsx -Table -TableStyle Medium10 -AutoFit
+        Add-Table -Path C:\Temp\files.xlsx -TableStyle Medium10
 
         # Get files, create an xlsx in C:\temp\ps.xlsx
 
-        # Take existing xlsx and add a table with the Medium10 style autofitting everything
+        # Take existing xlsx and add a table with the Medium10 style
 
     .EXAMPLE
         # Create an xlsx.

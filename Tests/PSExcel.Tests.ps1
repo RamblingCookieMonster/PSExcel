@@ -523,11 +523,3 @@ Describe "Verb-Noun PS$PSVersion" {
 
 Remove-Item $NewXLSXFile -force -ErrorAction SilentlyContinue
 Remove-Item $ExistingXLSXFile -force -ErrorAction SilentlyContinue
-
-
-
-
-
-
-
-        

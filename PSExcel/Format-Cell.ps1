@@ -115,7 +115,7 @@
         # Set autofit between minumum of 5 and maximum of 20
         $Excel |
             Get-WorkSheet |
-            Format-Cell -Autofit -AutofitMinWidth  -AutofitMaxWidth 20
+            Format-Cell -Autofit -AutofitMinWidth 5 -AutofitMaxWidth 20
 
     .NOTES
         Thanks to Doug Finke for his example:

@@ -382,6 +382,11 @@
                             $StyleName = "dates"
                             $StyleFormat = "M/d/yyy h:mm"
                         }
+                        "TimeSpan"
+                        {
+                            #Open to other ways to handle this
+                            $WorkSheet.SetValue($RowIndex, $ColumnIndex, "$Value")
+                        }
                         default
                         {
                             #No default yet...

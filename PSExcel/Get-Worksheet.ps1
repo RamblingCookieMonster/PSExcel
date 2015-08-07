@@ -77,7 +77,15 @@
 
         If($Name)
         {
-            $Output | Where-Object {$_.Name -like $Name}
+            $FilteredOutput = $Output | Where-Object {$_.Name -like $Name}
+            if($Name -notmatch '\*' -and -not $FilteredOutput)
+            {
+                Write-Error "$Name could not be found. Valid worksheets:`n$($Output | Select -ExpandProperty Name | Out-String)"
+            }
+            else
+            {
+                $FilteredOutput
+            }
         }
         else
         {

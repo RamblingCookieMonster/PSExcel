@@ -45,10 +45,16 @@
         We don't check header names, but header count must match.
 
     .PARAMETER Force
-        If file exists, overwrite it.  Otherwise, we try to add a new worksheet.
+        If file exists, overwrite it.
 
     .PARAMETER ClearSheet
-        If worksheet exists, clear it.  Otherwise, we try to add a new worksheet.
+        If worksheet with the same name exists, clear it before filling it in
+
+    .PARAMETER RemoveSheet
+        If worksheet with the same name exists, remove it and re-add it
+
+    .PARAMETER Passthru
+        If specified, we re-open the ExcelPackage and return it
 
     .EXAMPLE
         $Files = Get-ChildItem C:\ -File
@@ -92,6 +98,17 @@
 
     .EXAMPLE
 
+        # Create XLSX
+        Get-ChildItem -file | Export-XLSX -Path C:\temp\multi.xlsx
+
+        # Add a second worksheet to the xlsx
+        Get-ChildItem -file | Export-XLSX -Path C:\temp\multi.xlsx -WorksheetName "Two"
+
+        # I don't like that second worksheet. Recreate it, deleting the existing worksheet if it exists.
+        Get-ChildItem -file | Select -first 1 | Export-XLSX -Path C:\temp\multi.xlsx -WorksheetName "Two" -ReplaceSheet
+
+    .EXAMPLE
+
         Get-ChildItem C:\ -file |
             Export-XLSX -Path C:\temp\files.xlsx -PivotRows Extension -PivotValues Length -ChartType Pie
 
@@ -105,11 +122,11 @@
 
     .EXAMPLE
 
-	Get-Process | Export-XLSX -Path C:\temp\process.xlsx -Worksheet process -Table -TableStyle Medium1 -AutoFit
+	    Get-Process | Export-XLSX -Path C:\temp\process.xlsx -Worksheet process -Table -TableStyle Medium1 -AutoFit
 
-	# Get all processes
-	# Create an xlsx
-	# Create a table with the Medium1 style and all cells autofit on the 'process' worksheet
+	    # Get all processes
+	    # Create an xlsx
+	    # Create a table with the Medium1 style and all cells autofit on the 'process' worksheet
 
     .EXAMPLE
 
@@ -156,12 +173,9 @@
     .FUNCTIONALITY
         Excel
     #>
-    [CmdletBinding(DefaultParameterSetName='Path-NoPivot')]
+    [CmdletBinding(DefaultParameterSetName='Path')]
     param(
-        [parameter( ParameterSetName='Path-NoPivot',
-                    Position = 0,
-                    Mandatory=$true )]
-        [parameter( ParameterSetName='Path-Pivot',
+        [parameter( ParameterSetName='Path',
                     Position = 0,
                     Mandatory=$true )]
         [ValidateScript({
@@ -174,10 +188,7 @@
         })]
         [string]$Path,
 
-        [parameter( ParameterSetName='Excel-NoPivot',
-                    Position = 0,
-                    Mandatory=$true )]
-        [parameter( ParameterSetName='Excel-Pivot',
+        [parameter( ParameterSetName='Excel',
                     Position = 0,
                     Mandatory=$true )]
         [OfficeOpenXml.ExcelPackage]$Excel,
@@ -192,20 +203,12 @@
 
         [string]$WorksheetName = "Worksheet1",
 
-        [parameter( ParameterSetName = 'Excel-Pivot')]
-        [parameter( ParameterSetName = 'Path-Pivot')]
         [string[]]$PivotRows,
 
-        [parameter( ParameterSetName = 'Excel-Pivot')]
-        [parameter( ParameterSetName = 'Path-Pivot')]
         [string[]]$PivotColumns,
 
-        [parameter( ParameterSetName = 'Excel-Pivot')]
-        [parameter( ParameterSetName = 'Path-Pivot')]
         [string[]]$PivotValues,
 
-        [parameter( ParameterSetName = 'Excel-Pivot')]
-        [parameter( ParameterSetName = 'Path-Pivot')]
         [OfficeOpenXml.Drawing.Chart.eChartType]$ChartType,
 
         [switch]$Table,
@@ -218,7 +221,11 @@
 
         [switch]$Force,
 
-		[switch]$ClearSheet
+		[switch]$ClearSheet,
+
+        [switch]$ReplaceSheet,
+
+        [switch]$Passthru
     )
     begin
     {
@@ -251,7 +258,7 @@
             $Path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
         }
 
-        Write-Verbose "PSBoundParameters = $($PSBoundParameters | Out-String)"
+        Write-Verbose "Export-XLSX '$($PSCmdlet.ParameterSetName)' PSBoundParameters = $($PSBoundParameters | Out-String)"
 
         $bound = $PSBoundParameters.keys -contains "InputObject"
         if(-not $bound)
@@ -302,9 +309,35 @@
             $RowIndex = 2
             Try
             {
-                $Excel = New-Object OfficeOpenXml.ExcelPackage($Path) -ErrorAction Stop
+                if( $PSBoundParameters.ContainsKey('Path'))
+                {
+                    $Excel = New-Object OfficeOpenXml.ExcelPackage($Path) -ErrorAction Stop
+                }
+                else
+                {
+                    $Path = $Excel.File.FullName
+                }
+
                 $Workbook = $Excel.Workbook
-                if (($Append -or $ClearSheet) -and (Test-Path $Path) )
+                if($ReplaceSheet)
+                {
+                    Try
+                    {
+                        Write-Verbose "Attempting to delete worksheet $WorksheetName"
+                        $Workbook.Worksheets.Delete($WorksheetName)
+                    }
+                    Catch
+                    {
+                        if($_.Exception -notmatch 'Could not find worksheet to delete')
+                        {
+                            Write-Error "Error removing worksheet $WorksheetName"
+                            Throw $_
+                        }
+                    }
+                }
+
+                #If we have an excel or valid path, try to append or clearsheet as needed
+                if (($Append -or $ClearSheet) -and ($PSBoundParameters.ContainsKey('Excel') -or (Test-Path $Path)) )
                 {
                     $WorkSheet=$Excel.Workbook.Worksheets | Where-Object {$_.Name -like $WorkSheetName}
                     if($ClearSheet)
@@ -410,15 +443,17 @@
             }
 
             # Any pivot params specified?  add a pivot!
-            if($PSCmdlet.ParameterSetName -like '*-Pivot')
+            if($PSBoundParameters.Keys -match 'Pivot')
             {
                 $Params = @{}
                 if($PivotRows)    {$Params.Add('PivotRows',$PivotRows)}
                 if($PivotColumns) {$Params.Add('PivotColumns',$PivotColumns)}
                 if($PivotValues)  {$Params.Add('PivotValues',$PivotValues)}
                 if($ChartType)    {$Params.Add('ChartType',$ChartType)}
-                $Excel = Add-PivotTable @Params -Excel $Excel -WorkSheetName $WorksheetName -Passthru
+                $Excel = Add-PivotTable @Params -Excel $Excel -WorkSheetName $WorksheetName -Passthru -ErrorAction stop
+
             }
+
             # Create table
             elseif($Table)
             {
@@ -430,9 +465,12 @@
                 $WorkSheet.Cells[$WorkSheet.Dimension.Address].AutoFitColumns()
             }
 
-            if($PSBoundParameters.ContainsKey('Path'))
+            # This is an export command. Save whether we have a path or ExcelPackage input...
+            $Excel.SaveAs($Path)
+
+            if($Passthru)
             {
-                $Excel.SaveAs($Path)
+                New-Excel -Path $Path
             }
     }
 }

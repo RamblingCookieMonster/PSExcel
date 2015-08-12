@@ -16,8 +16,15 @@
         Replacement headers.  Must match order and count of your data's properties.
 
     .PARAMETER FirstRowIsData
-        Indicates that the first row is data, not headers.  Must be used with -Header. 
+        Indicates that the first row is data, not headers.  Must be used with -Header.
+
+    .PARAMETER Text
+        Extract cell text, rather than value.
             
+        For example, if you have a cell with value 5:
+            If the Number Format is '0', the text would be 5
+            If the Number Format is 0.00, the text would be 5.00 
+
     .EXAMPLE
         Import-XLSX -Path "C:\Excel.xlsx"
 
@@ -62,7 +69,9 @@
 
         [string[]]$Header,
 
-        [switch]$FirstRowIsData
+        [switch]$FirstRowIsData,
+
+        [switch]$Text
     )
     Process
     {
@@ -122,7 +131,14 @@
             {
                 $Header = @( foreach ($Column in 1..$Columns)
                 {
-                    $worksheet.Cells.Item(1,$Column).Value
+                    if($Text)
+                    {
+                        $worksheet.Cells.Item(1,$Column).Text
+                    }
+                    else
+                    {
+                        $worksheet.Cells.Item(1,$Column).Value
+                    }
                 } )
             }
 
@@ -136,7 +152,14 @@
                 foreach ($Column in 0..($Columns - 1) )
                 {
                     $Name  = $Header[$Column]
-                    $Value = $worksheet.Cells.Item($Row, ($Column+1)).Value
+                    if($Text)
+                    {
+                        $Value = $worksheet.Cells.Item($Row, ($Column+1)).Text
+                    }
+                    else
+                    {
+                        $Value = $worksheet.Cells.Item($Row, ($Column+1)).Value
+                    }
                     
                     Write-Debug "Row: $Row, Column: $Column, Name: $Name, Value = $Value"
 

@@ -178,6 +178,7 @@
         [System.Drawing.KnownColor]$BackgroundColor,
         [OfficeOpenXml.Style.ExcelFillStyle]$FillStyle,
         [boolean]$WrapText,
+        [String]$NumberFormat,
 
         [switch]$Autofit,
         [double]$AutofitMinWidth,
@@ -330,6 +331,9 @@
                         $CellRange.Style.Border.$Side.Style = $BorderStyle
                         $CellRange.Style.Border.$Side.Color.SetColor( $BorderColorConverted )
                     }
+                }
+                'NumberFormat' {
+                    $CellRange.Style.Numberformat.Format = $NumberFormat
                 }
             }
         if($Passthru)

@@ -56,6 +56,11 @@
     .PARAMETER WrapText
         Add or remove WrapText property (boolean)
 
+    .PARAMETER AutoFilter
+        Set autofilter for the cells
+
+        This currently only works for $True. It won't turn off Autofilter with $False.
+
     .PARAMETER AutoFit
         Apply auto fit to cells
 
@@ -180,6 +185,7 @@
         [boolean]$WrapText,
         [String]$NumberFormat,
 
+        [boolean]$AutoFilter,
         [switch]$Autofit,
         [double]$AutofitMinWidth,
         [double]$AutofitMaxWidth,
@@ -291,6 +297,7 @@
                 'WrapText'            { $CellRange.Style.WrapText = $WrapText  }
                 'VerticalAlignment'   { $CellRange.Style.VerticalAlignment = $VerticalAlignment }
                 'HorizontalAlignment' { $CellRange.Style.HorizontalAlignment = $HorizontalAlignment }
+                'AutoFilter'          { $CellRange.AutoFilter = $AutoFilter }
                 'Autofit'         {
                     #Probably a cleaner way to call this...
                     try

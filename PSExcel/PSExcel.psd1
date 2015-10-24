@@ -4,7 +4,7 @@
 ModuleToProcess = 'PSExcel.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0'
+ModuleVersion = '1.0.1'
 
 # ID used to uniquely identify this module
 GUID = '83cb61a0-582e-423a-bc94-91bd0be83c9a'
@@ -19,7 +19,7 @@ CompanyName = ''
 # Copyright = '(c) 2015 ramblingcookiemonster. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Work with Excel without Excel'
+Description = 'Work with Excel without installing Excel'
 
 # Minimum version of the Windows PowerShell engine required by this module
 PowerShellVersion = '2.0'

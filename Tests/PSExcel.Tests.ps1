@@ -91,6 +91,18 @@ Describe "Import-XLSX PS$PSVersion" {
             $Props[1] | Should be 'two' 
             $Props[2] | Should be 'three'  
         }
+
+        It 'should handle alternate row and column starts' {
+            $ExcelData = Import-XLSX -Path $PSScriptRoot\DataPlacementTest.xlsx -RowStart 3 -ColumnStart 2
+            $Props = $ExcelData[0].PSObject.Properties | Select -ExpandProperty Name
+
+            $ExcelData.count | Should be 10
+            $Props[0] | Should be 'Name'
+            $Props[1] | Should be 'Val'
+           
+            $Exceldata[0].val | Should be '944041859'
+            $Exceldata[0].name | Should be 'Prop1'
+        }
     }
 }
 

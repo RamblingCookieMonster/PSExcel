@@ -24,8 +24,8 @@ Import-Module $PSScriptRoot\..\PSExcel -Force
     $Files = Get-ChildItem $PSScriptRoot | Where {-not $_.PSIsContainer}
 
 Describe "New-Excel PS$PSVersion" {
-    
-    Context 'Strict mode' { 
+
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
@@ -57,8 +57,8 @@ Describe "New-Excel PS$PSVersion" {
 }
 
 Describe "Import-XLSX PS$PSVersion" {
-    
-    Context 'Strict mode' { 
+
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
@@ -69,14 +69,14 @@ Describe "Import-XLSX PS$PSVersion" {
             $ExcelData.count | Should be 10
             $Props[0] | Should be 'Name'
             $Props[1] | Should be 'Val'
-           
+
             $Exceldata[0].val | Should be '944041859'
             $Exceldata[0].name | Should be 'Prop1'
 
         }
         It 'should parse numberformat for dates' {
             $ExcelData = Import-XLSX -Path $ExistingXLSXFile
-             
+
             $Exceldata[0].Date -is [datetime] | Should be $True
             $Exceldata[0].Date.Month | Should be 1
             $Exceldata[0].Date.Year | Should be 2015
@@ -88,8 +88,8 @@ Describe "Import-XLSX PS$PSVersion" {
             $Props = $ExcelData[0].PSObject.Properties | Select -ExpandProperty Name
 
             $Props[0] | Should be 'one'
-            $Props[1] | Should be 'two' 
-            $Props[2] | Should be 'three'  
+            $Props[1] | Should be 'two'
+            $Props[2] | Should be 'three'
         }
 
         It 'should handle alternate row and column starts' {
@@ -99,13 +99,13 @@ Describe "Import-XLSX PS$PSVersion" {
             $ExcelData.count | Should be 10
             $Props[0] | Should be 'Name'
             $Props[1] | Should be 'Val'
-           
+
             $Exceldata[0].val | Should be '944041859'
             $Exceldata[0].name | Should be 'Prop1'
         }
 
         It 'should replace headers that are empty or whitespace' {
-            $ExcelData = Import-XLSX -Path $PSScriptRoot\BadHeaderTest.xlsx
+            $ExcelData = Import-XLSX -Path $PSScriptRoot\BadHeaderTest.xlsx -WarningAction SilentlyContinue
             $Props = $ExcelData[0].PSObject.Properties | Select -ExpandProperty Name
 
             $Props[1] | Should be '<Column 2>'
@@ -113,17 +113,18 @@ Describe "Import-XLSX PS$PSVersion" {
         }
 
         It 'should warn on headers that are empty or whitespace' {
-            $ExcelData = Import-XLSX -Path $PSScriptRoot\BadHeaderTest.xlsx 3>&1
+            $ExcelData = Import-XLSX -Path $PSScriptRoot\BadHeaderTest.xlsx 3> "$PSScriptRoot\BadHeaderWarnings.txt"
+            $Warnings  = Get-Content "$PSScriptRoot\BadHeaderWarnings.txt"
 
-            $ExcelData[0].ToString() | Should be 'Header in column 2 is whitespace or empty, setting header to ''<Column 2>'''
-            $ExcelData[1].ToString() | Should be 'Header in column 3 is whitespace or empty, setting header to ''<Column 3>'''
+            $Warnings[0].ToString() | Should be 'Header in column 2 is whitespace or empty, setting header to ''<Column 2>'''
+            $Warnings[1].ToString() | Should be 'Header in column 3 is whitespace or empty, setting header to ''<Column 3>'''
         }
     }
 }
 
 Describe "Export-XLSX PS$PSVersion" {
-    
-    Context 'Strict mode' { 
+
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
@@ -150,7 +151,7 @@ Describe "Export-XLSX PS$PSVersion" {
         It 'should build pivot tables' {
 
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
-            
+
             Get-ChildItem C:\Windows |
                 Where {-not $_.PSIsContainer} |
                 Export-XLSX -Path $NewXLSXFile -PivotRows Extension -PivotValues Length
@@ -166,14 +167,14 @@ Describe "Export-XLSX PS$PSVersion" {
         It 'should build pivot charts' {
 
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
-            
+
             Get-ChildItem C:\Windows |
                 Where {-not $_.PSIsContainer} |
                 Export-XLSX -Path $NewXLSXFile -PivotRows Extension -PivotValues Length -ChartType Pie
 
             $Excel = New-Excel -Path $NewXLSXFile
             $WorkSheet = @( $Excel | Get-Worksheet -Name PivotTable1 )
-            $WorkSheet[0].Drawings[0].ChartType.ToString() | Should be 'Pie' 
+            $WorkSheet[0].Drawings[0].ChartType.ToString() | Should be 'Pie'
 
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
         }
@@ -181,8 +182,8 @@ Describe "Export-XLSX PS$PSVersion" {
 }
 
 Describe "Close-Excel PS$PSVersion" {
-    
-    Context 'Strict mode' { 
+
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
@@ -211,58 +212,58 @@ Describe "Close-Excel PS$PSVersion" {
 }
 
 Describe "Save-Excel PS$PSVersion" {
-    
-    Context 'Strict mode' { 
+
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
         It 'should save an xlsx file' {
-            
+
             Remove-Item $NewXLSXFile -Force -ErrorAction SilentlyContinue
-            
+
             $Excel = New-Excel -Path $NewXLSXFile
             [void]$Excel.Workbook.Worksheets.Add(1)
             $Excel | Save-Excel
-            
+
             Test-Path $NewXLSXFile | Should be $True
         }
 
         It 'should close an excelpackage when specified' {
-            
+
             Remove-Item $NewXLSXFile -Force -ErrorAction SilentlyContinue
 
             $Excel = New-Excel -Path $NewXLSXFile
             [void]$Excel.Workbook.Worksheets.Add(1)
             $File = $Excel.File
             $Excel | Save-Excel -Close
-            
+
             $Excel.File -like $File | Should be $False
         }
 
         It 'should save as a specified path' {
-            
+
             Remove-Item "$NewXLSXFile`2" -Force -ErrorAction SilentlyContinue
             Remove-Item "$NewXLSXFile" -Force -ErrorAction SilentlyContinue
 
             $Excel = New-Excel -Path $NewXLSXFile
             [void]$Excel.Workbook.Worksheets.Add(1)
             $Excel | Save-Excel -Path "$NewXLSXFile`2"
-            
+
             Test-Path "$NewXLSXFile`2" | Should be $True
             Remove-Item "$NewXLSXFile`2" -Force -ErrorAction SilentlyContinue
         }
 
         It 'should return a fresh excelpackage when passthru is specified' {
-            
+
             #If you want to save twice, you need to pull the excel package back in, otherwise, it bombs out.
 
             Remove-Item "$NewXLSXFile" -Force -ErrorAction SilentlyContinue
-            
+
             $Excel = New-Excel -Path $NewXLSXFile
             [void]$Excel.Workbook.Worksheets.Add(1)
             $Excel = $Excel | Save-Excel -Passthru
-            
-            $Excel -is [OfficeOpenXml.ExcelPackage] | Should Be $True 
+
+            $Excel -is [OfficeOpenXml.ExcelPackage] | Should Be $True
 
             [void]$Excel.Workbook.Worksheets.Add(2)
             @($Excel.Workbook.Worksheets).count | Should be 2
@@ -270,7 +271,7 @@ Describe "Save-Excel PS$PSVersion" {
 
             $Excel = New-Excel -Path $NewXLSXFile
             @($Excel.Workbook.Worksheets).count | Should be 2
-            
+
             Remove-Item "$NewXLSXFile" -Force -ErrorAction SilentlyContinue
         }
     }
@@ -281,12 +282,12 @@ Describe "Save-Excel PS$PSVersion" {
 # Describe "Get-Workbook PS$PSVersion" {}
 Describe "Get-Worksheet PS$PSVersion" {
 
- Context 'Strict mode' { 
+ Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
         It 'Should return a worksheet' {
-         
+
             $Excel = New-Excel -Path $ExistingXLSXFile
             $WorkSheet = $Excel | Get-Worksheet
             $WorkSheet -is [OfficeOpenXml.ExcelWorksheet] | Should Be $True
@@ -299,12 +300,12 @@ Describe "Get-Worksheet PS$PSVersion" {
 
 Describe "Search-CellValue PS$PSVersion" {
 
-    Context 'Strict mode' { 
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
         It 'Should find cells' {
-            
+
             $Result = @( Search-CellValue -Path $ExistingXLSXFile -FilterScript {$_ -eq "Prop2" -or ($_ -is [datetime] -and $_.day -like 7)} )
             $Result.Count | Should be 2
             $Result[0].Row | Should be 3
@@ -328,22 +329,22 @@ Describe "Search-CellValue PS$PSVersion" {
 
 Describe "Add-Table PS$PSVersion" {
 
-    Context 'Strict mode' { 
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
         It 'Should add a table to an existing xlsx' {
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
-            
+
 	    $TableName = "TestTable"
 	    $WorkSheetName = 'Worksheet1'
-	    
+
             Get-ChildItem C:\Windows |
                 Where {-not $_.PSIsContainer} |
                 Export-XLSX -Path $NewXLSXFile
 
             Add-Table -Path $NewXLSXFile -WorkSheetName $WorkSheetName -TableStyle Medium10 -TableName $TableName
-            
+
             $Excel = New-Excel -Path $NewXLSXFile
             $WorkSheet = @( $Excel | Get-Worksheet -Name $WorkSheetName )
 
@@ -351,18 +352,18 @@ Describe "Add-Table PS$PSVersion" {
 	    $Table.Name | Should be $TableName
 	    $Table.Worksheet | Should be $WorkSheetName
 	    $Table.StyleName | Should be 'TableStyleMedium10'
-	    
+
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
         }
 	It 'Should create a table in an xlsx' {
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
-            
+
 	    $WorkSheetName = 'Worksheet1'
-	    
+
             Get-ChildItem C:\Windows |
                 Where {-not $_.PSIsContainer} |
                 Export-XLSX -Path $NewXLSXFile -WorkSheetName $WorkSheetName -Table -TableStyle Medium10 -AutoFit
-            
+
             $Excel = New-Excel -Path $NewXLSXFile
             $WorkSheet = @( $Excel | Get-Worksheet -Name $WorkSheetName )
 
@@ -370,7 +371,7 @@ Describe "Add-Table PS$PSVersion" {
 	    $Table.Name | Should be $WorkSheetName
 	    $Table.Worksheet | Should be $WorkSheetName
 	    $Table.StyleName | Should be 'TableStyleMedium10'
-	    
+
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
         }
     }
@@ -378,19 +379,19 @@ Describe "Add-Table PS$PSVersion" {
 
 Describe "Add-PivotTable PS$PSVersion" {
 
-    Context 'Strict mode' { 
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
         It 'Should add a pivot table to an existing xlsx' {
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
-            
+
             Get-ChildItem C:\Windows |
                 Where {-not $_.PSIsContainer} |
                 Export-XLSX -Path $NewXLSXFile
 
             Add-PivotTable -Path $NewXLSXFile -WorkSheetName 'Worksheet1' -PivotTableWorksheetName 'PivotTable2' -PivotRows Extension -PivotValues Length
-            
+
             $Excel = New-Excel -Path $NewXLSXFile
             $WorkSheet = @( $Excel | Get-Worksheet -Name PivotTable2 )
 
@@ -400,13 +401,13 @@ Describe "Add-PivotTable PS$PSVersion" {
         }
         It 'Should add a pivot chart if specified' {
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
-            
+
             Get-ChildItem C:\Windows |
                 Where {-not $_.PSIsContainer} |
                 Export-XLSX -Path $NewXLSXFile
 
             Add-PivotTable -Path $NewXLSXFile -WorkSheetName 'Worksheet1' -PivotTableWorksheetName 'PivotTable2' -PivotRows Extension -PivotValues Length -ChartType Area3D
-            
+
             $Excel = New-Excel -Path $NewXLSXFile
             $WorkSheet = @( $Excel | Get-Worksheet -Name PivotTable2 )
 
@@ -419,19 +420,19 @@ Describe "Add-PivotTable PS$PSVersion" {
 
 Describe "Add-PivotChart PS$PSVersion" {
 
-    Context 'Strict mode' { 
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
         It 'Should add a pivot chart' {
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
-            
+
             Get-ChildItem C:\Windows |
                 Where {-not $_.PSIsContainer} |
                 Export-XLSX -Path $NewXLSXFile -PivotRows Extension -PivotValues Length
 
             Add-PivotChart -Path $NewXLSXFile -ChartType Pie3D
-            
+
             $Excel = New-Excel -Path $NewXLSXFile
             $WorkSheet = @( $Excel | Get-Worksheet -Name PivotTable1 )
 
@@ -445,7 +446,7 @@ Describe "Add-PivotChart PS$PSVersion" {
 
 Describe "Set-CellValue PS$PSVersion" {
 
-    Context 'Strict mode' { 
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
@@ -474,7 +475,7 @@ Describe "Set-CellValue PS$PSVersion" {
 
 Describe "Get-CellValue PS$PSVersion" {
 
-    Context 'Strict mode' { 
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
@@ -482,7 +483,7 @@ Describe "Get-CellValue PS$PSVersion" {
             Copy-Item -Path $ExistingXLSXFile -Destination $NewXLSXFile -Force
 
             $Excel = New-Excel -Path $NewXLSXFile
-            
+
             $Result = @($Excel | Get-CellValue -Coordinates "A2:A3")
             $Result[0].Name | Should be 'Prop1'
             $Result[1].Name | Should be 'Prop2'
@@ -500,7 +501,7 @@ Describe "Get-CellValue PS$PSVersion" {
 
 Describe "Join-Worksheet PS$PSVersion" {
 
-    Context 'Strict mode' { 
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 
@@ -522,8 +523,8 @@ Describe "Join-Worksheet PS$PSVersion" {
 
                 $Result.count | Should Be 5
                 $Names = $Result | Select -ExpandProperty Name
-                $ExpectedNames = echo jsmith1, jsmith2, jsmith3, 'Department 4', 'Department 5' 
-                
+                $ExpectedNames = echo jsmith1, jsmith2, jsmith3, 'Department 4', 'Department 5'
+
                 @(Compare-Object $Names $ExpectedNames).count | Should Be 0
                 @($Result | ?{$_.Name -eq 'jsmith2'})[0].Manager -like $null | Should Be $true
         }
@@ -534,7 +535,7 @@ Describe "Join-Worksheet PS$PSVersion" {
 <#
 Describe "Verb-Noun PS$PSVersion" {
 
-    Context 'Strict mode' { 
+    Context 'Strict mode' {
 
         Set-StrictMode -Version latest
 

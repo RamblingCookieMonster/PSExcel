@@ -153,12 +153,19 @@
                 {
                     if($Text)
                     {
-                        $worksheet.Cells.Item($RowStart,$Column).Text
+                        $PotentialHeader = $worksheet.Cells.Item($RowStart,$Column).Text
                     }
                     else
                     {
-                        $worksheet.Cells.Item($RowStart,$Column).Value
+                        $PotentialHeader = $worksheet.Cells.Item($RowStart,$Column).Value
                     }
+
+                    if( -Not $PotentialHeader -Or $PotentialHeader.Trim().Equals("") )
+                    {
+                        Write-Warning "Header in column $Column is whitespace or empty, setting header to '<Column $Column>'"
+                        $PotentialHeader = "<Column $Column>" # Use placeholder name
+                    }
+                    $PotentialHeader
                 })
             }
 

@@ -103,6 +103,14 @@ Describe "Import-XLSX PS$PSVersion" {
             $Exceldata[0].val | Should be '944041859'
             $Exceldata[0].name | Should be 'Prop1'
         }
+
+        It 'should replace headers that are empty or whitespace' {
+            $ExcelData = Import-XLSX -Path $PSScriptRoot\BadHeaderTest.xlsx -WarningAction SilentlyContinue
+            $Props = $ExcelData[0].PSObject.Properties | Select -ExpandProperty Name
+
+            $Props[1] | Should be '<Column 2>'
+            $Props[2] | Should be '<Column 3>'
+        }
     }
 }
 

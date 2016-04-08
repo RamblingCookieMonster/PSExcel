@@ -105,18 +105,16 @@ Describe "Import-XLSX PS$PSVersion" {
         }
 
         It 'should replace headers that are empty or whitespace' {
-            $ExcelData = Import-XLSX -Path $PSScriptRoot\BadHeaderTest.xlsx
+            $OldWarningPreference = $WarningPreference
+            $WarningPreference = 'SilentlyContinue' # Silence the warnings in PowerShell v2
+            
+            $ExcelData = Import-XLSX -Path $PSScriptRoot\BadHeaderTest.xlsx -WarningAction SilentlyContinue # Silence the warnings in PowerShell v3+
             $Props = $ExcelData[0].PSObject.Properties | Select -ExpandProperty Name
 
             $Props[1] | Should be '<Column 2>'
             $Props[2] | Should be '<Column 3>'
-        }
-
-        It 'should warn on headers that are empty or whitespace' {
-            $ExcelData = Import-XLSX -Path $PSScriptRoot\BadHeaderTest.xlsx 3>&1
-
-            $ExcelData[0].ToString() | Should be 'Header in column 2 is whitespace or empty, setting header to ''<Column 2>'''
-            $ExcelData[1].ToString() | Should be 'Header in column 3 is whitespace or empty, setting header to ''<Column 3>'''
+            
+            $WarningPreference = $OldWarningPreference
         }
     }
 }

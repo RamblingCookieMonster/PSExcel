@@ -212,7 +212,7 @@
 
         [string[]]$PivotValues,
         
-        [OfficeOpenXml.Table.PivotTable.DataFieldFunctions]$PivotFunction = [OpenOfficeXml.Table.PivotTable.DataFieldFunction]::Count,
+        [OfficeOpenXml.Table.PivotTable.DataFieldFunctions]$PivotFunction = [OfficeOpenXml.Table.PivotTable.DataFieldFunctions]::Count,
 
         [OfficeOpenXml.Drawing.Chart.eChartType]$ChartType,
 

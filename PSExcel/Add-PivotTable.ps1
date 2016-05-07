@@ -48,6 +48,9 @@
     .PARAMETER PivotColumns
         Pivot on these columns
 
+    .PARAMETER PivotFunction
+        If specified, use this summary mode for pivot values (defaults to Count mode)
+
     .PARAMETER ChartType
         If specified, add a chart with this type
 
@@ -160,6 +163,7 @@
         [string[]]$PivotRows,
         [string[]]$PivotColumns,
         [string[]]$PivotValues,
+        [OfficeOpenXml.Table.PivotTable.DataFieldFunctions]$PivotFunction = [OfficeOpenXml.Table.PivotTable.DataFieldFunctions]::Count,
 
         [OfficeOpenXml.Drawing.Chart.eChartType]$ChartType,
         [string]$ChartTitle,
@@ -278,7 +282,8 @@
 
                     foreach ($Value in @($PivotValues | Select -Unique))
                     {
-                        [void]$PivotTable.DataFields.Add($PivotTable.Fields[$Value])
+                        $field = $PivotTable.DataFields.Add($PivotTable.Fields[$Value])
+                        $field.Function = $PivotFunction
                     }
                 }
 

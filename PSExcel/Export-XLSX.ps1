@@ -30,6 +30,9 @@
     .PARAMETER PivotValues
         If specified, add pivot table pivoting on these values
 
+    .PARAMETER PivotFunction
+        If specified, use this summary mode for pivot values (defaults to Count mode)
+
     .PARAMETER ChartType
         If specified, add pivot chart of this type
 
@@ -208,6 +211,8 @@
         [string[]]$PivotColumns,
 
         [string[]]$PivotValues,
+        
+        [OfficeOpenXml.Table.PivotTable.DataFieldFunctions]$PivotFunction = [OfficeOpenXml.Table.PivotTable.DataFieldFunctions]::Count,
 
         [OfficeOpenXml.Drawing.Chart.eChartType]$ChartType,
 
@@ -446,10 +451,11 @@
             if($PSBoundParameters.Keys -match 'Pivot')
             {
                 $Params = @{}
-                if($PivotRows)    {$Params.Add('PivotRows',$PivotRows)}
-                if($PivotColumns) {$Params.Add('PivotColumns',$PivotColumns)}
-                if($PivotValues)  {$Params.Add('PivotValues',$PivotValues)}
-                if($ChartType)    {$Params.Add('ChartType',$ChartType)}
+                if($PivotRows)     {$Params.Add('PivotRows',$PivotRows)}
+                if($PivotColumns)  {$Params.Add('PivotColumns',$PivotColumns)}
+                if($PivotValues)   {$Params.Add('PivotValues',$PivotValues)}
+                if($PivotFunction) {$Params.Add('PivotFunction',$PivotFunction)}
+                if($ChartType)     {$Params.Add('ChartType',$ChartType)}
                 $Excel = Add-PivotTable @Params -Excel $Excel -WorkSheetName $WorksheetName -Passthru -ErrorAction stop
 
             }

@@ -31,6 +31,8 @@ param(
     {
         "`n`tSTATUS: Testing with PowerShell $PSVersion`n"
     
+        write-host "Great, let's just commit a bunch of nonsense: $(gci C:\Temp -recurse | select -expandproperty fullname)"
+
         Import-Module C:\temp\Pester -force
 
         Invoke-Pester @Verbose -Path "$ProjectRoot\Tests" -OutputFormat NUnitXml -OutputFile "$ProjectRoot\$TestFile" -PassThru |

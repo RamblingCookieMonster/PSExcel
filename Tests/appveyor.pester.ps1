@@ -9,6 +9,9 @@ param(
     [string]$ProjectRoot = $ENV:APPVEYOR_BUILD_FOLDER
 )
 
+# Temporary until we move to a better build pipeline...
+$ENV:PSModulePath = $ENV:PSModulePath, 'C:\Temp' -join ";"
+
 #Initialize some variables, move to the project root
     $Timestamp = Get-date -uformat "%Y%m%d-%H%M%S"
     $PSVersion = $PSVersionTable.PSVersion.Major

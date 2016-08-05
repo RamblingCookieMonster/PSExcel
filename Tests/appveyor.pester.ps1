@@ -10,7 +10,7 @@ param(
 )
 
 # Temporary until we move to a better build pipeline...
-$ENV:PSModulePath = $ENV:PSModulePath, 'C:\Temp' -join ";"
+    $ENV:PSModulePath = $ENV:PSModulePath, 'C:\Temp' -join ";"
 
 #Initialize some variables, move to the project root
     $Timestamp = Get-date -uformat "%Y%m%d-%H%M%S"
@@ -31,7 +31,7 @@ $ENV:PSModulePath = $ENV:PSModulePath, 'C:\Temp' -join ";"
     {
         "`n`tSTATUS: Testing with PowerShell $PSVersion`n"
     
-        Import-Module Pester -force
+        Import-Module C:\temp\Pester -force
 
         Invoke-Pester @Verbose -Path "$ProjectRoot\Tests" -OutputFormat NUnitXml -OutputFile "$ProjectRoot\$TestFile" -PassThru |
             Export-Clixml -Path "$ProjectRoot\PesterResults_PS$PSVersion`_$Timestamp.xml"

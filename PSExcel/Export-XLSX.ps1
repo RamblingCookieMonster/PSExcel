@@ -370,8 +370,8 @@
                 Throw "Failed to initialize Excel, Workbook, or Worksheet. Try -ClearSheet switch if worksheet already exists:`n`n_"
             }
 
-        #Set those headers if we aren't appending
-            if(-not $Append)
+        #Set those headers if we aren't appending.
+            if(-not $Append -or $RowIndex -le 3)
             {
                 for ($ColumnIndex = 1; $ColumnIndex -le $Header.count; $ColumnIndex++)
                 {

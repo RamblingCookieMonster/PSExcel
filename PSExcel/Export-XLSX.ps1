@@ -341,6 +341,12 @@
                     }
                 }
 
+                # They asked for append but we don't have a worksheet.  Drop the append switch.
+                if($Excel.Workbook.WorkSheets.count -eq 0 )
+                {
+                    $Append = $False
+                }
+
                 #If we have an excel or valid path, try to append or clearsheet as needed
                 if (($Append -or $ClearSheet) -and ($PSBoundParameters.ContainsKey('Excel') -or (Test-Path $Path)) )
                 {

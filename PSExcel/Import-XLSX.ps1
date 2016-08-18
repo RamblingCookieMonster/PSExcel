@@ -1,76 +1,54 @@
-﻿function Import-XLSX {
+function Import-XLSX {
     <#
     .SYNOPSIS
         Import data from Excel
-
     .DESCRIPTION
         Import data from Excel
-
     .PARAMETER Path
         Path to an xlsx file to import
-
     .PARAMETER Sheet
         Index or name of Worksheet to import
-
     .PARAMETER Header
         Replacement headers.  Must match order and count of your data's properties.
-
     .PARAMETER RowStart
         First row to start reading from, typically the header. Default is 1
-
     .PARAMETER ColumnStart
         First column to start reading from. Default is 1
-
     .PARAMETER FirstRowIsData
         Indicates that the first row is data, not headers.  Must be used with -Header.
-
     .PARAMETER Text
         Extract cell text, rather than value.
-
         For example, if you have a cell with value 5:
             If the Number Format is '0', the text would be 5
             If the Number Format is 0.00, the text would be 5.00 
-
     .EXAMPLE
         Import-XLSX -Path "C:\Excel.xlsx"
-
         #Import data from C:\Excel.xlsx
-
     .EXAMPLE
         Import-XLSX -Path "C:\Excel.xlsx" -Header One, Two, Five
-
         # Import data from C:\Excel.xlsx
         # Replace headers with One, Two, Five
-
     .EXAMPLE
         Import-XLSX -Path "C:\Excel.xlsx" -Header One, Two, Five -FirstRowIsData -Sheet 2
-
         # Import data from C:\Excel.xlsx
         # Assume first row is data
         # Use headers One, Two, Five
         # Pull from sheet 2 (sheet 1 is default)
-
     .EXAMPLE
        #    A        B        C 
        # 1  Random text to mess with you!
        # 2  Header1  Header2  Header3
        # 3  data1    Data2    Data3
-
        # Your worksheet has data you don't care about in the first row or column
        # Use the ColumnStart or RowStart parameters to solve this.
-
        Import-XLSX -Path C:\RandomTextInRow1.xlsx -RowStart 2
-
     .NOTES
         Thanks to Doug Finke for his example:
             https://github.com/dfinke/ImportExcel/blob/master/ImportExcel.psm1
-
         Thanks to Philip Thompson for an expansive set of examples on working with EPPlus in PowerShell:
             https://excelpslib.codeplex.com/
-
     .LINK
         https://github.com/RamblingCookieMonster/PSExcel
-
     .FUNCTIONALITY
         Excel
     #>
@@ -88,12 +66,47 @@
 
         [switch]$FirstRowIsData,
 
-        [switch]$Text,
+        [ValidateSet('Text', 'Value')]
+        [string]$Interpreter = 'Value',
 
-        [int]$RowStart = 1,
+        [UInt32]$RowStart,
 
-        [int]$ColumnStart = 1
+        [UInt32]$ColumnStart,
+
+        [UInt32]$RowCount,
+        
+        [UInt32]$ColumnCount,
+
+        [switch]$IgnoreEmptyCells,
+
+        [UInt32]$RowHeader
     )
+    Begin
+    {
+        function ColumnNumberToColumnName([uint64] $ColumnNumber)
+        {
+            while ($ColumnNumber -gt 0)
+            {
+                $Modulo = ($ColumnNumber - 1) % 26
+                $ColumnName = [Char] (65 + $Modulo) + $ColumnName;
+                $ColumnNumber = [uint64](($ColumnNumber - $Modulo) / 26);
+            }
+
+            $ColumnName
+        }
+
+        function ColumnNameToColumnNumber([string] $ColumnName)
+        {
+            for ($i = 0; $i -lt $ColumnName.Length; $i++)
+            {
+                $sum *= 26;
+                $sum += ($ColumnName[$i] - 65 + 1);
+            }
+
+            $sum
+        }
+    }
+    
     Process
     {
         foreach($file in $path)
@@ -101,8 +114,8 @@
             #Resolve relative paths... Thanks Oisin! http://stackoverflow.com/a/3040982/3067642
             $file = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($file)
 
-            write-verbose "target excel file $($file)"
-
+            Write-Verbose "target excel file $($file)"
+            
             Try
             {
                 $xl = New-Object OfficeOpenXml.ExcelPackage $file
@@ -123,13 +136,31 @@
                 else
                 {
                     $worksheet = $workbook.Worksheets[$Sheet]
-                    $dimension = $worksheet.Dimension
+                    
+                    if (-not $worksheet.Dimension)
+                    {
+                        Write-Verbose "Worksheet is empty"
+                        continue
+                    }
+                    
+                    $ranges = [regex]::Matches($worksheet.Dimension.Address, '[A-Za-z]+|\d+')
+                    
+                    if (-not $ColumnStart)
+                    {
+                        $ColumnStart = ColumnNameToColumnNumber $ranges[0].Value
+                    }
 
-                    $Rows = $dimension.Rows
-                    $Columns = $dimension.Columns
+                    if (-not $RowStart)
+                    {
+                        $RowStart = $ranges[1].Value
+                    }
 
-                    $ColumnEnd = $Columns + $ColumnStart - 1
-                    $RowEnd = $Rows + $RowStart - 1
+                    $ColumnEnd = if ($ColumnCount) {$ColumnCount + $ColumnStart} else {ColumnNameToColumnNumber $ranges[2].Value}
+                    $RowEnd = if ($RowCount) {$RowCount + $RowStart} else {$ranges[3].Value}
+                    $RowHeader = if ($RowHeader) {$RowHeader} else {$RowStart}
+
+                    $RowCount = $RowEnd - $RowStart + 1
+                    $ColumnCount = $ColumnEnd - $ColumnStart + 1
                 }
 
             }
@@ -139,64 +170,66 @@
                 continue
             }
   
-            if($Header -and $Header.count -gt 0)
+            # Define headears
+            $Headers = @()
+
+            foreach ($i in $ColumnStart..$ColumnEnd)
             {
-                if($Header.count -ne $Columns)
+                if ($Header -and -not [string]::IsNullOrEmpty($Header[$i - $ColumnStart]) -and $Header[$i - $ColumnStart] -notin $Headers)
                 {
-                    Write-Error "Found '$columns' columns, provided $($header.count) headers.  You must provide a header for every column."
+                    $Headers += $Header[$i - $ColumnStart]
+                    continue
                 }
-                Write-Verbose "User defined headers: $Header"
-            }
-            else 
-            {
-                $Header = @( foreach ($Column in $ColumnStart..$ColumnEnd)
+
+                $Value = ([string] $worksheet.Cells.Item($RowHeader,$i).$Interpreter).Trim()
+
+                if ([string]::IsNullOrEmpty($Value) -or $FirstRowIsData)
                 {
-                    if($Text)
-                    {
-                        $PotentialHeader = $worksheet.Cells.Item($RowStart,$Column).Text
-                    }
-                    else
-                    {
-                        $PotentialHeader = $worksheet.Cells.Item($RowStart,$Column).Value
-                    }
+                    $Headers += "Column$(ColumnNumberToColumnName $i)"
+                    continue
+                }
 
-                    if( -Not $PotentialHeader -Or $PotentialHeader.Trim().Equals("") )
-                    {
-                        Write-Warning "Header in column $Column is whitespace or empty, setting header to '<Column $Column>'"
-                        $PotentialHeader = "<Column $Column>" # Use placeholder name
-                    }
-                    $PotentialHeader
-                })
+                $i = 1
+                $originalValue = $Value
+
+                while ($Value -in $Headers)
+                {
+                    $Value = "$originalValue$i"
+                    $i++ 
+                }
+
+                $Headers += $Value
             }
 
-            [string[]]$SelectedHeaders = @( $Header | select -Unique )
-            Write-Verbose "Found $Rows rows, $Columns columns, with headers:`n$($Header | Out-String)"
+            Write-Verbose "Will read $RowCount rows, $ColumnCount columns, with headers:`n$($Header | Out-String)"
+
+            $typeName = "Excel$(([System.IO.FileInfo]$File).BaseName)" 
+            Update-TypeData -DefaultDisplayPropertySet $Headers -TypeName $typeName -Force
 
             if(-not $FirstRowIsData)
             {
                 $RowStart++
-            }
 
-            foreach ($Row in $RowStart..$RowEnd)
+                if ($RowStart -gt $RowEnd)
+                {
+                    continue
+                }
+            }
+            
+            foreach ($RowId in $RowStart..$RowEnd)
             {
                 $RowData = @{}
+                $RowHeaders = @()
 
-                foreach ($Column in 0..($Columns - 1))
+                foreach ($ColumnId in $ColumnStart..$ColumnEnd)
                 {
-                    $Name  = $Header[$Column]
-                    if($Text)
-                    {
-                        $Value = $worksheet.Cells.Item($Row, ($Column + $ColumnStart)).Text
-                    }
-                    else
-                    {
-                        $Value = $worksheet.Cells.Item($Row, ($Column + $ColumnStart)).Value
-                    }
-
-                    Write-Debug "Row: $Row, Column: $Column, Name: $Name, Value = $Value"
+                    $Name  = $Headers[$ColumnId - $ColumnStart]
+                    
+	                $Value = $worksheet.Cells.Item($RowId, $ColumnId).$Interpreter
+                    Write-Debug "Row: $RowId, Column: $ColumnId, Name: $Name, Value = $Value"
 
                     #Handle dates, they're too common to overlook... Could use help, not sure if this is the best regex to use?
-                    $Format = $worksheet.Cells.Item($Row, ($Column + $ColumnStart)).style.numberformat.format
+                    $Format = $worksheet.Cells.Item($RowId, $ColumnId).style.numberformat.format
                     if($Format -match '\w{1,4}/\w{1,2}/\w{1,4}( \w{1,2}:\w{1,2})?')
                     {
                         Try
@@ -209,16 +242,24 @@
                         }
                     }
 
-                    if($RowData.ContainsKey($Name) )
+                    if ($IgnoreEmptyCells -and [string]::IsNullOrEmpty($Value))
                     {
-                        Write-Warning "Duplicate header for '$Name' found, with value '$Value', in row $Row"
+                        Write-Verbose "Ignoring empty cell on row $RowId and column $ColumnId"
                     }
                     else
                     {
                         $RowData.Add($Name, $Value)
+                        $RowHeaders += $Name
                     }
                 }
-                New-Object -TypeName PSObject -Property $RowData | Select -Property $SelectedHeaders
+                
+                if (@($psObject.PSObject.Properties).Count -gt 0)
+                {
+                    $psObject = New-Object -TypeName PSObject -Property $RowData
+                    $psObject = $psObject | Select $RowHeaders
+                    $psObject.PSTypeNames.Insert(0, $typeName)
+                    $psObject
+                }
             }
 
             $xl.Dispose()

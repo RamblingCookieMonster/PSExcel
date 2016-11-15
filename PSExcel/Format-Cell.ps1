@@ -1,4 +1,4 @@
-﻿function Format-Cell {
+function Format-Cell {
     <#
     .SYNOPSIS
         Format cells in an Excel worksheet
@@ -69,6 +69,12 @@
     
     .PARAMETER AutoFitMaxWidth
         Maximum width to set autofit with
+		
+	.PARAMETER Height
+		If specified, override autofit preferences to apply the defined row height.
+	
+	.PARAMETER Width
+		If specified, override autofit preferences to apply the defined row width.
 
     .PARAMETER VerticalAlignment
         Set the vertical alignment
@@ -189,6 +195,8 @@
         [switch]$Autofit,
         [double]$AutofitMinWidth,
         [double]$AutofitMaxWidth,
+		[double]$Height,
+		[double]$Width,
 
         [OfficeOpenXml.Style.ExcelVerticalAlignment]$VerticalAlignment,
         [OfficeOpenXml.Style.ExcelHorizontalAlignment]$HorizontalAlignment,
@@ -320,6 +328,28 @@
                         Write-Error $_
                     }
                 }
+				'Height'              { 
+					try
+					{
+						for($i=$StartRow;$i -le $EndRow; $i++)
+							{$WorkSheet.Row($i).Height = $Height }
+					}
+					Catch
+					{
+						Write-Error $_
+					}
+				}
+				'Width'              { 
+					try
+					{
+						for($i=$StartColumn;$i -le $EndColumn; $i++)
+							{$WorkSheet.Column($i).Width = $Width }
+					}
+					Catch
+					{
+						Write-Error $_
+					}
+				}
                 'Border' {
                     If($Border -eq '*')
                     {

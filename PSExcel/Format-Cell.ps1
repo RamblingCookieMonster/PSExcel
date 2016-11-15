@@ -70,11 +70,11 @@ function Format-Cell {
     .PARAMETER AutoFitMaxWidth
         Maximum width to set autofit with
 		
-	.PARAMETER Height
-		If specified, override autofit preferences to apply the defined row height.
+    .PARAMETER Height
+	If specified, override autofit preferences to apply the defined row height.
 	
-	.PARAMETER Width
-		If specified, override autofit preferences to apply the defined row width.
+    .PARAMETER Width
+	If specified, override autofit preferences to apply the defined row width.
 
     .PARAMETER VerticalAlignment
         Set the vertical alignment
@@ -90,6 +90,12 @@ function Format-Cell {
 
     .PARAMETER BorderColor
         Color for the border. Defaults to Black
+
+    .PARAMETER Comment
+    	Add a comment to the cell(s). You must include the comment and author
+	
+    .Parameter AutoFitComment
+    	If specified, the comment box will autofit to the text supplied. Ignored if comment not specified
 
     .PARAMETER Passthru
         If specified, pass the Worksheet back
@@ -118,6 +124,9 @@ function Format-Cell {
         $WorkSheet | Format-Cell -StartRow 2 -StartColumn 1 -EndColumn 1 -Italic $True -Size 10
 
         # Set the first column, rows 2 through the end to size 10, italic
+    .EXAMPLE
+    	# Add a comment to the first 3 columns of the second row, and autofit the comment box to the included text.
+	$WorkSheet | Format-Cell -StartRow 2 -StartColumn 1 -EndColumn 3 -Comment "This is a comment on a cell.`nWe can even do multiple lines!","JohnSmith" -AutoFitComment
 
     .EXAMPLE
           
@@ -187,6 +196,7 @@ function Format-Cell {
         
         [System.Drawing.KnownColor]$Color,
         [System.Drawing.KnownColor]$BackgroundColor,
+	[string[]]$Comment,
         [OfficeOpenXml.Style.ExcelFillStyle]$FillStyle,
         [boolean]$WrapText,
         [String]$NumberFormat,
@@ -302,6 +312,18 @@ function Format-Cell {
                     $CellRange.Style.Fill.PatternType = $FillStyle
                     $CellRange.Style.Fill.BackgroundColor.SetColor($BackgroundColorConverted)
                 }
+		'Comment'             { ForEach ($Row in $StartRow..$EndRow) {
+						ForEach ($Column in $StartColumn..$EndColumn) {
+							$CommentCell = ConvertTo-ExcelCoordinate -Row $Row -Column $Column
+							$NewComment = $WorkSheet.Cells["$CommentCell`:$CommentCell"].AddComment($Comment[0],$Comment[1])
+							if($PSBoundParameters.ContainsKey('AutoFitComment'))
+								{
+									$NewComment.Autofit = $true
+								}
+
+						}
+					}
+		}
                 'WrapText'            { $CellRange.Style.WrapText = $WrapText  }
                 'VerticalAlignment'   { $CellRange.Style.VerticalAlignment = $VerticalAlignment }
                 'HorizontalAlignment' { $CellRange.Style.HorizontalAlignment = $HorizontalAlignment }

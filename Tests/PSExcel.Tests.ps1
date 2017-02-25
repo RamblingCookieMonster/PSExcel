@@ -45,7 +45,7 @@ Describe "New-Excel PS$PSVersion" {
         It 'should reflect the correct path' {
             Remove-Item $NewXLSXFile -force -ErrorAction silentlycontinue
             $Excel = New-Excel -Path $NewXLSXFile
-            $Excel.File | Should be $NewXLSXFile
+            $Excel.File.ToString() | Should be "$NewXLSXFile"
             $Excel.Dispose()
             $Excel = $Null
         }
@@ -342,7 +342,7 @@ Describe "Add-Table PS$PSVersion" {
 
             $Table = $Worksheet[0].Tables[0]
 	    $Table.Name | Should be $TableName
-	    $Table.Worksheet | Should be $WorkSheetName
+	    $Table.Worksheet.ToString() | Should be $WorkSheetName
 	    $Table.StyleName | Should be 'TableStyleMedium10'
 	    
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force
@@ -361,7 +361,7 @@ Describe "Add-Table PS$PSVersion" {
 
             $Table = $Worksheet[0].Tables[0]
 	    $Table.Name | Should be $WorkSheetName
-	    $Table.Worksheet | Should be $WorkSheetName
+	    $Table.Worksheet.ToString() | Should be $WorkSheetName
 	    $Table.StyleName | Should be 'TableStyleMedium10'
 	    
             Remove-Item $NewXLSXFile -ErrorAction SilentlyContinue -force

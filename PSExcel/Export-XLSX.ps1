@@ -474,7 +474,10 @@
 
             if($AutoFit)
             {
-                $WorkSheet.Cells[$WorkSheet.Dimension.Address].AutoFitColumns()
+                if($WorkSheet.Dimension.Address -notlike $null)
+                {
+                    $WorkSheet.Cells[$WorkSheet.Dimension.Address].AutoFitColumns()
+                }
             }
 
             # This is an export command. Save whether we have a path or ExcelPackage input...

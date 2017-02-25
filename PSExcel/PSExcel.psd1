@@ -4,13 +4,13 @@
 ModuleToProcess = 'PSExcel.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.1'
+ModuleVersion = '1.0.3'
 
 # ID used to uniquely identify this module
 GUID = '83cb61a0-582e-423a-bc94-91bd0be83c9a'
 
 # Author of this module
-Author = 'ramblingcookiemonster'
+Author = 'Warren Frame'
 
 # Company or vendor of this module
 CompanyName = ''
@@ -76,7 +76,20 @@ PowerShellVersion = '2.0'
 # FileList = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
-# PrivateData = ''
+PrivateData = @{
+        PSData = @{
+
+        # Tags applied to this module. These help with module discovery in online galleries.
+         Tags = @('Excel', 'PSExcel', 'Workbook', 'WorkSheet', 'Spreadsheet')
+
+        # A URL to the license for this module.
+         LicenseUri = 'https://github.com/RamblingCookieMonster/PSExcel/blob/master/LICENSE'
+
+        # A URL to the main website for this project.
+         ProjectUri = 'https://github.com/RamblingCookieMonster/PSExcel'
+
+    } # End of PSData hashtable
+}
 
 # HelpInfo URI of this module
 # HelpInfoURI = ''

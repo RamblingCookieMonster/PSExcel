@@ -377,7 +377,7 @@
             }
 
         #Set those headers if we aren't appending
-            if(-not $Append)
+            if(-not $Append -or $RowIndex -le 3)
             {
                 for ($ColumnIndex = 1; $ColumnIndex -le $Header.count; $ColumnIndex++)
                 {

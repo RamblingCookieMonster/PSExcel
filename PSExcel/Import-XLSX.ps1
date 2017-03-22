@@ -128,8 +128,8 @@
                     $Rows = $dimension.Rows
                     $Columns = $dimension.Columns
 
-                    $ColumnEnd = $Columns - 1
-                    $RowEnd = $Rows - 1
+                    $ColumnEnd = $Columns
+                    $RowEnd = $Rows
                 }
 
             }

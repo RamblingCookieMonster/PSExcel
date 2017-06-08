@@ -14,7 +14,10 @@
 
     .PARAMETER Header
         Replacement headers.  Must match order and count of your data's properties.
-
+    
+    .PARAMETER DateTimeFormat
+        This format is used to detect datetime values within the excel sheet.
+    
     .PARAMETER RowStart
         First row to start reading from, typically the header. Default is 1
 
@@ -89,6 +92,8 @@
         [switch]$FirstRowIsData,
 
         [switch]$Text,
+        
+        [string]$DateTimeFormat = "M/d/yyy h:mm",
 
         [int]$RowStart = 1,
 
@@ -197,7 +202,7 @@
 
                     #Handle dates, they're too common to overlook... Could use help, not sure if this is the best regex to use?
                     $Format = $worksheet.Cells.Item($Row, ($Column + $ColumnStart)).style.numberformat.format
-                    if($Format -match '\w{1,4}/\w{1,2}/\w{1,4}( \w{1,2}:\w{1,2})?')
+                    if($Format -match '\w{1,4}/\w{1,2}/\w{1,4}( \w{1,2}:\w{1,2})?' -or $Format -match $DateTimeFormat)
                     {
                         Try
                         {

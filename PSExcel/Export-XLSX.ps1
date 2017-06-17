@@ -32,6 +32,9 @@
 
     .PARAMETER PivotFunction
         If specified, use this summary mode for pivot values (defaults to Count mode)
+	
+    .PARAMETER DateTimeFormat
+    	Specifies the format for dates.
 
     .PARAMETER ChartType
         If specified, add pivot chart of this type
@@ -211,6 +214,8 @@
         [string[]]$PivotColumns,
 
         [string[]]$PivotValues,
+	
+	[string]$DateTimeFormat = "M/d/yyy h:mm",
         
         [OfficeOpenXml.Table.PivotTable.DataFieldFunctions]$PivotFunction = [OfficeOpenXml.Table.PivotTable.DataFieldFunctions]::Count,
 
@@ -424,7 +429,7 @@
                         "datetime"
                         {
                             $StyleName = "dates"
-                            $StyleFormat = "M/d/yyy h:mm"
+                            $StyleFormat = $DateTimeFormat
                         }
                         "TimeSpan"
                         {

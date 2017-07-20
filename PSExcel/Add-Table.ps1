@@ -1,4 +1,4 @@
-﻿function Add-Table {
+function Add-Table {
     <#
     .SYNOPSIS
         Add a table to an Excel worksheet
@@ -41,6 +41,9 @@
 
     .PARAMETER TableName
         Name of the table, defaults to worksheet name if none provided
+
+    .PARAMETER Autofit
+        Autofit the worksheet columns to the size of the data
 
     .PARAMETER Passthru
         If specified, pass the ExcelPackage back
@@ -126,6 +129,8 @@
 
         [string]$TableName,
 
+        [switch]$Autofit,
+
         [switch]$Passthru
     )
     Process
@@ -198,6 +203,11 @@
                 {
                     Write-Verbose "Adding $TableStyle table style"
                     $Table.TableStyle = $TableStyle
+                }
+
+                if($Autofit)
+                {
+                    $Table.WorkSheet.Cells.AutoFitColumns()
                 }
 
             if($PSCmdlet.ParameterSetName -like 'File' -and -not $Passthru)

@@ -207,6 +207,7 @@
 
         [string[]]$Header,
 
+	[ValidateLength(1,31)]
         [string]$WorksheetName = "Worksheet1",
 
         [string[]]$PivotRows,

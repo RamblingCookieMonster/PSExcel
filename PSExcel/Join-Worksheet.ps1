@@ -309,13 +309,14 @@
 
         switch ($PSBoundParameters.Keys)
         {
-            'Excel'      { $ExportParams.Add('Excel',$Excel) }
-            'Path'       { $ExportParams.Add('Path',$Path) }
-            'Header'     { $ExportParams.Add('Header',$Header) }
-            'Table'      { $ExportParams.Add('Table',$Table) }
-            'TableStyle' { $ExportParams.Add('TableStyle',$TableStyle) }
-            'AutoFit'    { $ExportParams.Add('AutoFit',$AutoFit) }
-            'Force'      { $ExportParams.Add('Force',$Force) }
+            'Excel'                     { $ExportParams.Add('Excel',$Excel) }
+            'Path'                      { $ExportParams.Add('Path',$Path) }
+            'Header'                    { $ExportParams.Add('Header',$Header) }
+            'Table'                     { $ExportParams.Add('Table',$Table) }
+            'TableStyle'                { $ExportParams.Add('TableStyle',$TableStyle) }
+            'AutoFit'                   { $ExportParams.Add('AutoFit',$AutoFit) }
+            'Force'                     { $ExportParams.Add('Force',$Force) }
+            'DestinationWorksheetName'  { $ExportParams.Add('WorksheetName',$DestinationWorksheetName) }
         }
 
         Export-XLSX @ExportParams

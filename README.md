@@ -3,6 +3,8 @@
 PSExcel
 =============
 
+**IMPORTANT:**  This project is no longer maintained.  Please consider Doug's excellent [ImportExcel example](https://github.com/dfinke/ImportExcel), which is frequently updated by Doug and the community.
+
 This is a rudimentary PowerShell module for working with Excel via the [EPPlus](http://epplus.codeplex.com/) library, with no dependencies on Excel itself.
 
 * Thanks to Doug Finke for his [ImportExcel example](https://github.com/dfinke/ImportExcel) - hadn't seen EPPlus before this!
@@ -15,13 +17,13 @@ Caveats:
 * Minimal testing.  Contributions welcome!
 * Naming conventions subject to change.  Suggestions welcome!
 
-#Functionality
+## Functionality
 
 * Export random PowerShell output to Excel spreadsheets
 * Import Excel spreadsheets to PowerShell as objects
 * No dependency on Excel being installed
 
-#Instructions
+## Instructions
 
 ```powershell
 # One time setup
@@ -50,7 +52,7 @@ Caveats:
 
 ```
 
-#Examples
+## Examples
 
 Several examples are available on [the accompanying blog post](http://ramblingcookiemonster.github.io/PSExcel-Intro/) and the embedded [Gist](https://gist.github.com/RamblingCookieMonster/7f49beeaebb570204581#file-zpsexcel-intro-ps1).
 
@@ -176,5 +178,6 @@ This is straight from Doug Finke's fantastic [ImportExcel module](https://github
 
 [![Pivot](http://ramblingcookiemonster.github.io/images/psexcel-intro/pivot.png)](http://ramblingcookiemonster.github.io/images/psexcel-intro/pivot.png)
 
+## Notes
 
 Note that while some of these examples leverage PowerShell version 3 or later language, the module itself should work with PowerShell 2, and all Pester tests run against both PowerShell 2 and PowerShell 4.

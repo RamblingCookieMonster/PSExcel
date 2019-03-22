@@ -128,6 +128,12 @@
                 else
                 {
                     $worksheet = $workbook.Worksheets[$Sheet]
+                    if(!$worksheet)
+                    {
+                        Write-Error "Unkown worksheet and/or Failed to gather Worksheet '$Sheet' data for file '$file':`n$_"
+                        continue
+                    }
+                    
                     $dimension = $worksheet.Dimension
 
                     $Rows = $dimension.Rows

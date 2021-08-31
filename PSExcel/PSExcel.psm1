@@ -5,7 +5,7 @@
     }
 
 #Import assembly:
-    $BinaryPath = Join-Path $PSScriptRoot 'lib\epplus.dll'
+    $BinaryPath = Join-Path $PSScriptRoot 'lib\EPPlus.dll'
     if( -not ($Library = Add-Type -path $BinaryPath -PassThru -ErrorAction stop) )
     {
         Throw "Failed to load EPPlus binary from $BinaryPath"
